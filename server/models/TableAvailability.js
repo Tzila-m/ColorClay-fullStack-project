@@ -15,10 +15,10 @@ const tableAvailabilitySchema = new mongoose.Schema({
         enum: ["morning", "afternoon", "evening"],
         required: true
     },
-    isAvailable: {
-        type: Boolean,
-        default: true
-    },
+    // isAvailable: {
+    //     type: Boolean,
+    //     default: true
+    // },
     orderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Order",
