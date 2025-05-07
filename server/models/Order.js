@@ -40,6 +40,11 @@ const orderSchema = new mongoose.Schema({
     date: {
         type: Date,
         rerquired: true
+    },
+    timeSlot: {
+        type: String,
+        enum: ["morning", "afternoon", "evening"],
+        required: true
     }
 })
 
