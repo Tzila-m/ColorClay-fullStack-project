@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 
+
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
@@ -27,17 +28,20 @@ const userSchema = new mongoose.Schema({
     },
     orders:
         [{ type: mongoose.Schema.Types.ObjectId, ref: "Order" }],
-        
+       
     roles: {
         type: String,
         enum: ['User', 'Admin'],
         default: "User",
-    },
-    active: {
-        type: Boolean,
-        default: true,
-    },
+    }
 }, { timestamps: true }
 )
 
+
 module.exports = mongoose.model("User", userSchema);
+
+
+
+
+
+

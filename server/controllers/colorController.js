@@ -1,73 +1,55 @@
-const Color = require("../models/Color")
+const Color = require("../models/Color");
 
-//get
+//get 
 exports.getAllColors = async (req, res) => {
-
-    const colors = await Color.find()
-    res.status(201).json(colors)
+    const colors = await Color.find();
+    res.status(200).json(colors);
 }
 
-exports.getColorById = async(req,res) =>{
-
-    const { _id } = req.params
-    if (!_id)
-        return res.status(400).json({ message: "Please fill all fields" })
-
-    const color = await Color.findById(_id)
-    if (!color)
-        return res.status(400).json({ message: "Color not found" })
-
-    res.status(201).json(color)
+//get 
+exports.getColorById = async (req, res) => {
+    const _id=req.params.id;
+    if ( !_id) 
+        return res.status(400).json({ message: "Please fill _id" })
+    const color = await Color.findById(_id);
+    res.status(200).json(color);
 }
 
 //post
 exports.createColor = async (req, res) => {
     const { name, code, imageUrl } = req.body
-    if (!name || !code)
+    if (!code || !name) 
         return res.status(400).json({ message: "Please fill all fields" })
-
-    const isExist = await Color.find({code})
-    if(isExist)
-        return res.status(400).json({ message: "code exist" })
-
-    const color = Color.create({ name, code, imageUrl })
+    const isExist= await Color.findOne({code});
+    if (isExist)
+        return res.status(404).json({ message: "Color exist" })
+    const color = await Color.create({ name, code, imageUrl });
     if (!color)
-        return res.status(400).json({ message: "Error creating color" })
-
-    const colors = await Color.find()
-    res.status(201).json(colors)
+        return res.status(500).json({ message: "Error creating color" });
+    const colors = await Color.find();
+    res.status(201).json(colors);
 }
 
 //put
 exports.updateAvailableColor = async (req, res) => {
-    const { _id } = req.params
-
-    if (!_id)
+    const _id  = req.params.id
+    if (!_id) 
         return res.status(400).json({ message: "Please fill all fields" })
-
-    const color = await Color.findById(_id)
-    if (!color)
-        return res.status(400).json({ message: "Color not found" })
-
-    color.isAvailable = !color.isAvailable
-    await color.save()
-
-    const colors = await Color.find()
-    res.status(201).json(colors)
-
+    const color = await Color.findById(_id);
+    if (!color) 
+        return res.status(404).json({ message: "Color not found" })
+    color.isAvailable = !color.isAvailable;
+    await color.save();
+    const colors = await Color.find();
+    res.status(200).json(colors);
 }
 
 //delete
 exports.deleteColor = async (req, res) => {
-    const { _id } = req.params
-    if (!_id)
+    const  _id  = req.params.id
+    if (!_id) 
         return res.status(400).json({ message: "Please fill all fields" })
-
-    await Color.deleteOne({ _id });
-
-    const colors = await Color.find()
-    res.status(201).json(colors)
-
+    await Color.deleteOne({ _id});
+    const colors = await Color.find();
+    res.status(200).json(colors);
 }
-
-

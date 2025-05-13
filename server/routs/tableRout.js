@@ -2,9 +2,16 @@ const express = require("express")
 const router = express.Router()
 const table = require("../controllers/tableController")
 
-router.get("/getAllTables",table.getAllTables)
-router.get("/getTableById/:id",table.getColorById)
-router.post("/createTable", table.createTable)
-router.delete("/deletaTable/:id",table.deleteTable)
+const verifyJWT = require("../middleware/verifyJWT")
+const verifyAdmin = require("../middleware/verifyAdmin")
 
-module.exports = router
+router.use(verifyJWT)
+
+router.get("/",table.getAllTables)
+router.get("/:id",table.getTableById)
+
+router.post("/",verifyAdmin,table.createTable)
+
+router.delete("/:id",verifyAdmin,table.deleteTable)
+
+module.exports=router

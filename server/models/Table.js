@@ -1,15 +1,16 @@
 const mongoose = require("mongoose");
 
 const tableSchema = new mongoose.Schema({
-    tableNumber: {
-        type: Number,
-        require: true,
-        unique: true
-    },
-    chairCount: {
-        type: Number,
-        require: true,
-    }
+
+  tableNumber: {
+    type:Number,
+    required: true,
+    unique: true },
+  
+  chairCount:{
+    type:Number,
+    required: true,
+  },
 
 });
 

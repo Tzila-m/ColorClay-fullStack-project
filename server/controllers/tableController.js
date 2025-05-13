@@ -1,59 +1,43 @@
-const Table = require("../models/Table")
+const Table = require("../models/Table");
 
-//get
+//get 
 exports.getAllTables = async (req, res) => {
-
-    const tables = await Table.find()
-    res.status(201).json(tables)
+    const tables = await Table.find();
+    res.status(200).json(tables);
 }
 
-exports.getColorById = async(req,res) =>{
-
-    const { _id } = req.params
+//get 
+exports.getTableById = async (req, res) => {
+    const _id = req.params.id;
     if (!_id)
-        return res.status(400).json({ message: "Please fill all fields" })
-
-    const table = await Table.findById(_id)
-    if (!table)
-        return res.status(400).json({ message: "Table not found" })
-
-    res.status(201).json(table)
+        return res.status(400).json({ message: "Please fill _id" })
+    const table = await Table.findById(_id);
+    res.status(200).json(table);
 }
-
 
 //post
 exports.createTable = async (req, res) => {
-    const { chairCount, tableNumber } = req.body
-    if (!chairCount || !tableNumber)
+    const { tableNumber, chairCount} = req.body
+    if (!tableNumber || !chairCount )
         return res.status(400).json({ message: "Please fill all fields" })
-
-    const isExist = await Product.find({tableNumber})
-    if(isExist)
-        return res.status(400).json({ message: "tableNumber table exist" })
-
-    const table = Table.create({  chairCount, tableNumber })
+    const isExist = await Table.findOne({ tableNumber });
+    console.log(isExist)
+    if (isExist)
+        return res.status(400).json({ message: "code tableNumber exist" })
+    
+    const table = await Table.create({  tableNumber, chairCount });
     if (!table)
-        return res.status(400).json({ message: "Error creating table" })
-
-    const tables = await Table.find()
-    res.status(201).json(tables)
+        return res.status(500).json({ message: "Error creating table" });
+    const tables = await Table.find();
+    res.status(201).json(table);
 }
 
 //delete
 exports.deleteTable = async (req, res) => {
-    const { _id } = req.params
+    const  _id  = req.params.id
     if (!_id)
         return res.status(400).json({ message: "Please fill all fields" })
-
     await Table.deleteOne({ _id });
-
-    const tables = await Table.find()
-    res.status(201).json(tables)
-
+    const tables = await Table.find();
+    res.status(200).json(tables);
 }
-
-
-
-
-
-

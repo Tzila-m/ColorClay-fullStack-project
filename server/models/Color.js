@@ -1,29 +1,26 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 const colorSchema = new mongoose.Schema({
     name: {
-        type: String,
-        require: true
+        type:String,
+        required: true,
     },
 
     code: {
-        type: String,
-        require: true,
-        unique: true
-
+        type:String,
+        required: true,
+        unique: true,
     },
 
     isAvailable: {
         type: Boolean,
         default: true
     },
-
+    
     imageUrl: {
         type: String,
-        default: ""
-
+        default: "https://example.com/default-image.jpg" // Default image URL   
     }
-})
+});
 
-module.exports = mongoose.model("Color", colorSchema);
-
+module.exports = mongoose.model("Color", colorSchema)
