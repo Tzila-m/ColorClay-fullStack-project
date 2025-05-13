@@ -2,15 +2,10 @@ const express = require("express")
 const router = express.Router()
 const tableAvailabilityController = require("../controllers/tableAvailabilityController")
 
-const verifyJWT = require("../middleware/verifyJWT")
-const verifyAdmin = require("../middleware/verifyAdmin")
+router.get("/getyByDateAndtimeSlots",tableAvailabilityController.getyByDateAndtimeSlot)
 
-router.use(verifyJWT)
+router.post("/createTableAvailability",tableAvailabilityController.createTableAvailability)
 
-router.get("/",tableAvailabilityController.getAvailableTables)
-
-router.get("/ByDate",tableAvailabilityController.getReservationsByDate)
-
-router.delete("/",verifyAdmin,tableAvailabilityController.deleteByDate)  
+router.delete("deleteTodayTableAvailabilities" ,tableAvailabilityController.deleteTodayTableAvailabilities)
 
 module.exports=router

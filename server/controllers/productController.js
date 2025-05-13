@@ -8,7 +8,7 @@ exports.getAllProducts = async (req, res) => {
 
 //get 
 exports.getProductById = async (req, res) => {
-    const _id = req.params.id;
+    const _id = req.params;
     if (!_id)
         return res.status(400).json({ message: "Please fill _id" })
     const product = await Product.findById(_id);
@@ -18,9 +18,9 @@ exports.getProductById = async (req, res) => {
 //post
 exports.createProduct = async (req, res) => {
     const { name, code, price, imageUrl, categoryId } = req.body
-    if (!name || !code || !price || !categoryId)
+    if (!name || !code || !price)
         return res.status(400).json({ message: "Please fill all fields" })
-    const isExist = await Product.findOne({ code });
+    const isExist = await Product.find({ code });
     if (isExist)
         return res.status(400).json({ message: "code product exist" })
     
@@ -33,13 +33,13 @@ exports.createProduct = async (req, res) => {
 
 //put
 exports.updateAvailableProduct = async (req, res) => {
-    const _id = req.params.id
+    const { _id } = req.params
     if (!_id)
         return res.status(400).json({ message: "Please fill all fields" })
     const product = await Product.findById(_id);
     if (!product)
         return res.status(404).json({ message: "Product not found" })
-    product.isAvailable = !product.isAvailable;
+    Product.isAvailable = !product.isAvailable;
     await product.save();
     const products = await Product.find();
     res.status(200).json(products);
@@ -47,7 +47,7 @@ exports.updateAvailableProduct = async (req, res) => {
 
 //delete
 exports.deleteProduct = async (req, res) => {
-    const  _id  = req.params.id
+    const { _id } = req.params
     if (!_id)
         return res.status(400).json({ message: "Please fill all fields" })
     await Product.deleteOne({ _id });

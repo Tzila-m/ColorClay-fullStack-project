@@ -8,7 +8,7 @@ exports.getAllColors = async (req, res) => {
 
 //get 
 exports.getColorById = async (req, res) => {
-    const _id=req.params.id;
+    const _id=req.params;
     if ( !_id) 
         return res.status(400).json({ message: "Please fill _id" })
     const color = await Color.findById(_id);
@@ -20,9 +20,9 @@ exports.createColor = async (req, res) => {
     const { name, code, imageUrl } = req.body
     if (!code || !name) 
         return res.status(400).json({ message: "Please fill all fields" })
-    const isExist= await Color.findOne({code});
+    const isExist= await Color.find({code});
     if (isExist)
-        return res.status(404).json({ message: "Color exist" })
+        return res.status(404).json({ message: "Color not found" })
     const color = await Color.create({ name, code, imageUrl });
     if (!color)
         return res.status(500).json({ message: "Error creating color" });
@@ -32,7 +32,7 @@ exports.createColor = async (req, res) => {
 
 //put
 exports.updateAvailableColor = async (req, res) => {
-    const _id  = req.params.id
+    const { _id } = req.params
     if (!_id) 
         return res.status(400).json({ message: "Please fill all fields" })
     const color = await Color.findById(_id);
@@ -46,7 +46,7 @@ exports.updateAvailableColor = async (req, res) => {
 
 //delete
 exports.deleteColor = async (req, res) => {
-    const  _id  = req.params.id
+    const { _id } = req.params
     if (!_id) 
         return res.status(400).json({ message: "Please fill all fields" })
     await Color.deleteOne({ _id});
