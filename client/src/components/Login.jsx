@@ -1,36 +1,38 @@
-import React from 'react';
-import { Divider } from 'primereact/divider';
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
+import React,{useEffect} from "react";
+import {useLoginMutation} from './authApiSlice'
+import { useForm, SubmitHandler } from "react-hook-form"
+import { useDispatch } from "react-redux";
+import { setToken } from "./authSlice";
 
-export default function Login() {
-    return (
-        <div className="card">
-            <div className="flex flex-column md:flex-row justify-content-center align-items-center gap-5">
-                
-                <div className="flex flex-column align-items-center justify-content-center gap-3">
-                    <div className="flex flex-column gap-2">
-                        <label htmlFor="username">Username</label>
-                        <InputText id="username" type="text" className="w-20rem" />
-                    </div>
-                    <div className="flex flex-column gap-2">
-                        <label htmlFor="password">Password</label>
-                        <InputText id="password" type="password" className="w-20rem" />
-                    </div>
-                    <Button label="Login" icon="pi pi-user" className="w-20rem" />
-                </div>
+const Login=()=>{
+    const dispach=useDispatch() 
+    const [loginFunc,{data, error, isLoading,isSuccess,isError }]=useLoginMutation()
+    
 
-                <Divider layout="vertical" className="hidden md:flex">
-                    <b>OR</b>
-                </Divider>
-                <Divider layout="horizontal" className="flex md:hidden" align="center">
-                    <b>OR</b>
-                </Divider>
+    const { register, handleSubmit } = useForm()
+  const onSubmit = (data) =>{loginFunc(data)}
 
-                <div className="flex align-items-center justify-content-center">
-                    <Button label="Sign Up" icon="pi pi-user-plus" severity="success" className="w-20rem" />
-                </div>
-            </div>
-        </div>
-    );
+  useEffect(
+    ()=>{
+        if(isSuccess)
+            dispach(setToken(data))
+    },[isSuccess]
+  )
+  
+  return (
+
+    <form onSubmit={handleSubmit(onSubmit)}>
+      
+     
+      <input {...register("username", { required: true}) }placeholder="username"  />
+      <br/>
+      <input {...register("password", { required: true,min: 8 }) }placeholder="password"  />
+      
+      <input type="submit" />
+    </form>
+  )
+  
+   
 }
+export default Login
+
