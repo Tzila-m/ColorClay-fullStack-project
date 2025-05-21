@@ -1,8 +1,8 @@
 import React,{useEffect} from "react";
-import {useLoginMutation} from './authApiSlice'
+import {useLoginMutation} from '../features/auth/authApiSlice'
 import { useForm, SubmitHandler } from "react-hook-form"
 import { useDispatch } from "react-redux";
-import { setToken } from "./authSlice";
+import { setToken } from "../features/auth/authSlice";
 
 const Login=()=>{
     const dispach=useDispatch() 

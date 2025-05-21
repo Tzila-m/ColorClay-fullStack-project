@@ -4,7 +4,7 @@ import { Password } from 'primereact/password';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
-import { useRegisterMutation } from '../authApiSlice';
+import { useRegisterMutation } from '../features/auth/authApiSlice';
 
 const Register = () => {
     const [registerFunc] = useRegisterMutation();
