@@ -12,9 +12,8 @@ const basketApiSlice = createSlice({
   name: 'basket',
   initialState,
   reducers: {
-    // -- מוצר --
     addProduct: (state, action) => {
-      const newProduct = action.payload; // מצפה שיכלול code, price, name וכו'
+      const newProduct = action.payload;
       const existing = state.products.find(p => p.code === newProduct.code);
 
       if (existing) {
@@ -62,9 +61,8 @@ const basketApiSlice = createSlice({
       }
     },
 
-    // -- צבע --
     addColor: (state, action) => {
-      const newColor = action.payload; // מצפה שיכלול code, price, name וכו'
+      const newColor = action.payload;
       const existing = state.colors.find(c => c.code === newColor.code);
 
       if (existing) {
@@ -110,14 +108,6 @@ const basketApiSlice = createSlice({
         }
         state.totalPrice = state.totalProductsPrice + state.totalColorsPrice;
       }
-    },
-
-    clearBasket: (state) => {
-      state.products = [];
-      state.colors = [];
-      state.totalProductsPrice = 0;
-      state.totalColorsPrice = 0;
-      state.totalPrice = 0;
     },
   },
 });
