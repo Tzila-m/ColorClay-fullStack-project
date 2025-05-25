@@ -1,14 +1,18 @@
 const express = require("express")
 const router = express.Router()
 const color = require("../controllers/colorController")
+const verifyJWT = require("../middleware/verifyJWT")
+const verifyAdmin = require("../middleware/verifyAdmin")
 
-router.get("/getAllColors",color.getAllColors)
-router.get("/getColorById:id",color.getColorById)
+router.use(verifyJWT)
 
-router.post("/createColor",color.createColor)
+router.get("/",color.getAllColors)
+router.get("/:id",color.getColorById)
 
-router.put("updateAvailableColor:id",color.updateAvailableColor)
+router.post("/",verifyAdmin,color.createColor)
 
-router.delete("deletColor:id" ,color.deletColor)
+router.put("/:id",verifyAdmin,color.updateAvailableColor)
+
+router.delete("/:id",verifyAdmin,color.deleteColor)
 
 module.exports=router

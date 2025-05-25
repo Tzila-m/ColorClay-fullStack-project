@@ -2,13 +2,18 @@ const express = require("express")
 const router = express.Router()
 const product = require("../controllers/productController")
 
-router.get("/getAllProducts",color.getAllProducts)
-router.get("/getProductById:id",color.getProductById)
+const verifyJWT = require("../middleware/verifyJWT")
+const verifyAdmin = require("../middleware/verifyAdmin")
 
-router.post("/createProduct",color.createProduct)
+router.use(verifyJWT)
 
-router.put("updateAvailableProduct:id",color.updateAvailableProduct)
+router.get("/",product.getAllProducts)
+router.get("/byCategory/:categoryId",product.getProductByCategory)
 
-router.delete("deleteProduct:id" ,color.deleteProduct)
+router.post("/",verifyAdmin,product.createProduct)
+
+router.put("/:id",verifyAdmin,product.updateAvailableProduct)
+
+router.delete("/:id",verifyAdmin,product.deleteProduct)
 
 module.exports=router

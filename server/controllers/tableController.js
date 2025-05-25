@@ -1,14 +1,14 @@
-const Table = require("../models/Product");
+const Table = require("../models/Table");
 
 //get 
-exports.getAllTable = async (req, res) => {
+exports.getAllTables = async (req, res) => {
     const tables = await Table.find();
     res.status(200).json(tables);
 }
 
 //get 
-exports.getTabletById = async (req, res) => {
-    const _id = req.params;
+exports.getTableById = async (req, res) => {
+    const _id = req.params.id;
     if (!_id)
         return res.status(400).json({ message: "Please fill _id" })
     const table = await Table.findById(_id);
@@ -20,7 +20,8 @@ exports.createTable = async (req, res) => {
     const { tableNumber, chairCount} = req.body
     if (!tableNumber || !chairCount )
         return res.status(400).json({ message: "Please fill all fields" })
-    const isExist = await Table.find({ tableNumber });
+    const isExist = await Table.findOne({ tableNumber });
+    console.log(isExist)
     if (isExist)
         return res.status(400).json({ message: "code tableNumber exist" })
     
@@ -33,7 +34,7 @@ exports.createTable = async (req, res) => {
 
 //delete
 exports.deleteTable = async (req, res) => {
-    const { _id } = req.params
+    const  _id  = req.params.id
     if (!_id)
         return res.status(400).json({ message: "Please fill all fields" })
     await Table.deleteOne({ _id });
