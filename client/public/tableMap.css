@@ -1,0 +1,112 @@
+/* מבנה כללי */
+.table-map {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.table-row {
+  display: flex;
+  gap: 60px;
+  align-items: center;
+}
+
+/* כיסא עגול */
+.chair {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #d6ccc2; /* בז' קרמי */
+}
+
+/* שולחן צדדי קטן */
+.table-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* כפתור שולחן */
+.table-button {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid #dcdcdc;
+  background-color: #fefcfb; /* קרמי לבן */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 48px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.table-button:hover {
+  background-color: #e6f0e6; /* ירקרק בהיר */
+}
+
+.table-button.disabled {
+  background-color: #f0f0f0;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.table-button.selected {
+  background-color: #b5cbbb; /* ירקרק קרמי */
+  color: white;
+}
+
+/* שולחן מרכזי */
+.row-table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.row-table .center {
+  display: flex;
+  gap: 4px;
+}
+
+.table-center {
+  text-align: center;
+  border-radius: 12px;
+  border: 1px solid #dcdcdc;
+  background-color: #fefcfb;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  padding: 12px;
+  min-width: 96px;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-center.large {
+  min-width: 112px;
+  min-height: 80px;
+}
+
+.table-center:hover {
+  background-color: #e6f0e6;
+}
+
+.table-center.disabled {
+  background-color: #f0f0f0;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.table-center.selected {
+  background-color: #b5cbbb;
+  color: white;
+}

@@ -6,17 +6,19 @@ import {
     useCreateProductMutation
 } from '../features/productApiSlice';
 import { useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';
 import { Checkbox } from 'primereact/checkbox';
+import { addProduct } from '../features/basketApiSlice'; // ודא שזה נכון לפי הפרויקט שלך
 
 export default function ProductsPage() {
     const { categoryId } = useParams();
     const toast = useRef(null);
+    const dispatch = useDispatch();
 
     const [showAddDialog, setShowAddDialog] = useState(false);
     const [newProduct, setNewProduct] = useState({
@@ -26,6 +28,8 @@ export default function ProductsPage() {
         imageUrl: '',
         isAvailable: true,
     });
+
+    const [selectedProducts, setSelectedProducts] = useState([]);
 
     const user = useSelector((state) => state.auth.user);
     const isAdmin = user?.roles === 'admin';
@@ -68,6 +72,28 @@ export default function ProductsPage() {
         }
     };
 
+    const toggleProductSelect = (productId, isAvailable) => {
+        if (!isAvailable) {
+            toast.current.show({ severity: 'warn', summary: 'המוצר אינו זמין', life: 2000 });
+            return;
+        }
+
+        setSelectedProducts((prev) =>
+            prev.includes(productId)
+                ? prev.filter((id) => id !== productId)
+                : [...prev, productId]
+        );
+    };
+
+    const handleAddSelectedToBasket = () => {
+        selectedProducts.forEach((productId) => {
+            const product = products.find((p) => p._id === productId);
+            if (product) dispatch(addProduct(product));
+        });
+        toast.current.show({ severity: 'success', summary: 'המוצרים נוספו לסל', life: 3000 });
+        setSelectedProducts([]);
+    };
+
     const renderAdminControls = (product) => (
         <div className="flex gap-2 mt-3">
             <Button icon="pi pi-trash" severity="danger" onClick={(e) => {
@@ -93,7 +119,9 @@ export default function ProductsPage() {
                 {products.map((product) => (
                     <div
                         key={product._id}
-                        className="relative bg-white rounded-3xl shadow-lg hover:shadow-2xl transition p-6 flex flex-col items-center hover:scale-105 transition-transform"
+                        onClick={() => toggleProductSelect(product._id, product.isAvailable)}
+                        className={`relative bg-white rounded-3xl shadow-lg hover:shadow-2xl transition p-6 flex flex-col items-center hover:scale-105 transition-transform cursor-pointer
+                        ${selectedProducts.includes(product._id) ? 'border-4 border-green-400 bg-green-50' : ''}`}
                     >
                         <img
                             src={product.imageUrl}
@@ -110,6 +138,18 @@ export default function ProductsPage() {
                     </div>
                 ))}
             </div>
+
+            {!isAdmin && (
+                <div className="flex justify-center mt-10">
+                    <Button
+                        label="הוסף לסל"
+                        icon="pi pi-shopping-cart"
+                        className="p-button-success"
+                        onClick={handleAddSelectedToBasket}
+                        disabled={selectedProducts.length === 0}
+                    />
+                </div>
+            )}
 
             {isAdmin && (
                 <Button
