@@ -1,10 +1,4 @@
 import React, { useState, useRef } from 'react';
-import {
-    useGetProductByCategoryQuery,
-    useDeleteProductMutation,
-    useUpdateAvailableProductMutation,
-    useCreateProductMutation
-} from '../features/productApiSlice';
 import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button } from 'primereact/button';
@@ -13,12 +7,31 @@ import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';
 import { Checkbox } from 'primereact/checkbox';
-import { addProduct } from '../features/basketApiSlice'; // ודא שזה נכון לפי הפרויקט שלך
+
+import {
+    useGetProductByCategoryQuery,
+    useDeleteProductMutation,
+    useUpdateAvailableProductMutation,
+    useCreateProductMutation
+} from '../features/productApiSlice';
+
+import ProductCard from './ProductCard';
+
+import { addProduct } from '../features/basketApiSlice';  // וודא שיש לך slice עם פעולה כזו
 
 export default function ProductsPage() {
     const { categoryId } = useParams();
-    const toast = useRef(null);
     const dispatch = useDispatch();
+    const toast = useRef(null);
+
+    const user = useSelector(state => state.auth.user);
+    const isAdmin = user?.roles === 'admin';
+
+    const { data: products = [], isLoading, isError, error } = useGetProductByCategoryQuery(categoryId);
+
+    const [deleteProduct] = useDeleteProductMutation();
+    const [updateAvailable] = useUpdateAvailableProductMutation();
+    const [createProduct] = useCreateProductMutation();
 
     const [showAddDialog, setShowAddDialog] = useState(false);
     const [newProduct, setNewProduct] = useState({
@@ -31,27 +44,36 @@ export default function ProductsPage() {
 
     const [selectedProducts, setSelectedProducts] = useState([]);
 
-    const user = useSelector((state) => state.auth.user);
-    const isAdmin = user?.roles === 'admin';
-
-    const { data: products = [], isLoading, isError, error } = useGetProductByCategoryQuery(categoryId);
-    const [deleteProduct] = useDeleteProductMutation();
-    const [updateAvailable] = useUpdateAvailableProductMutation();
-    const [createProduct] = useCreateProductMutation();
+    // פונקציה לבחירה/הסרה של מוצר
+    const toggleProductSelect = (productId, isAvailable) => {
+        if (!isAvailable) {
+            toast.current.show({ severity: 'warn', summary: 'המוצר אינו זמין כעת', life: 3000 });
+            return;
+        }
+        setSelectedProducts(prev =>
+            prev.includes(productId)
+                ? prev.filter(id => id !== productId)
+                : [...prev, productId]
+        );
+    };
 
     const handleDelete = async (id) => {
+        if (!window.confirm('בטוח/ה שברצונך למחוק את המוצר?')) return;
+
         try {
             await deleteProduct(id).unwrap();
-            toast.current.show({ severity: 'success', summary: 'נמחק בהצלחה', life: 3000 });
+            toast.current.show({ severity: 'success', summary: 'המוצר נמחק בהצלחה', life: 3000 });
+            // הסר מהמוצרים שנבחרו אם היה
+            setSelectedProducts(prev => prev.filter(pid => pid !== id));
         } catch {
-            toast.current.show({ severity: 'error', summary: 'שגיאה במחיקה', life: 3000 });
+            toast.current.show({ severity: 'error', summary: 'שגיאה במחיקת המוצר', life: 3000 });
         }
     };
 
     const handleToggleAvailable = async (id) => {
         try {
             await updateAvailable(id).unwrap();
-            toast.current.show({ severity: 'success', summary: 'עודכן בהצלחה', life: 3000 });
+            toast.current.show({ severity: 'success', summary: 'זמינות המוצר עודכנה', life: 3000 });
         } catch {
             toast.current.show({ severity: 'error', summary: 'שגיאה בעדכון זמינות', life: 3000 });
         }
@@ -72,40 +94,16 @@ export default function ProductsPage() {
         }
     };
 
-    const toggleProductSelect = (productId, isAvailable) => {
-        if (!isAvailable) {
-            toast.current.show({ severity: 'warn', summary: 'המוצר אינו זמין', life: 2000 });
-            return;
-        }
-
-        setSelectedProducts((prev) =>
-            prev.includes(productId)
-                ? prev.filter((id) => id !== productId)
-                : [...prev, productId]
-        );
-    };
-
     const handleAddSelectedToBasket = () => {
-        selectedProducts.forEach((productId) => {
-            const product = products.find((p) => p._id === productId);
-            if (product) dispatch(addProduct(product));
+        selectedProducts.forEach(productId => {
+            const product = products.find(p => p._id === productId);
+            if (product) {
+                dispatch(addProduct(product));
+            }
         });
         toast.current.show({ severity: 'success', summary: 'המוצרים נוספו לסל', life: 3000 });
         setSelectedProducts([]);
     };
-
-    const renderAdminControls = (product) => (
-        <div className="flex gap-2 mt-3">
-            <Button icon="pi pi-trash" severity="danger" onClick={(e) => {
-                e.stopPropagation();
-                handleDelete(product._id);
-            }} />
-            <Button icon="pi pi-refresh" severity="info" onClick={(e) => {
-                e.stopPropagation();
-                handleToggleAvailable(product._id);
-            }} />
-        </div>
-    );
 
     if (isLoading) return <div className="p-4 text-center text-xl">טוען מוצרים...</div>;
     if (isError) return <div className="p-4 text-center text-red-500">שגיאה: {error?.message}</div>;
@@ -116,39 +114,28 @@ export default function ProductsPage() {
             <h1 className="text-center text-5xl font-bold mb-14 text-[#333]">מוצרים</h1>
 
             <div className="grid gap-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-                {products.map((product) => (
-                    <div
+                {products.map(product => (
+                    <ProductCard
                         key={product._id}
+                        product={product}
+                        isAdmin={isAdmin}
+                        isSelected={selectedProducts.includes(product._id)}
                         onClick={() => toggleProductSelect(product._id, product.isAvailable)}
-                        className={`relative bg-white rounded-3xl shadow-lg hover:shadow-2xl transition p-6 flex flex-col items-center hover:scale-105 transition-transform cursor-pointer
-                        ${selectedProducts.includes(product._id) ? 'border-4 border-green-400 bg-green-50' : ''}`}
-                    >
-                        <img
-                            src={product.imageUrl}
-                            alt={product.name}
-                            className="rounded-2xl mb-4"
-                            style={{ width: '100%', height: '200px', objectFit: 'cover' }}
-                        />
-                        <div className="text-2xl font-semibold text-center mb-1">{product.name}</div>
-                        <div className="text-xl text-primary font-medium mb-2">{product.price} ₪</div>
-                        <div className={`text-sm font-bold ${product.isAvailable ? 'text-green-600' : 'text-red-500'}`}>
-                            {product.isAvailable ? 'זמין' : 'לא זמין'}
-                        </div>
-                        {isAdmin && renderAdminControls(product)}
-                    </div>
+                        onDelete={() => handleDelete(product._id)}
+                        onToggleAvailable={() => handleToggleAvailable(product._id)}
+                    />
+
                 ))}
             </div>
 
             {!isAdmin && (
-                <div className="flex justify-center mt-10">
-                    <Button
-                        label="הוסף לסל"
-                        icon="pi pi-shopping-cart"
-                        className="p-button-success"
-                        onClick={handleAddSelectedToBasket}
-                        disabled={selectedProducts.length === 0}
-                    />
-                </div>
+                <Button
+                    label="הוסף לסל"
+                    icon="pi pi-shopping-cart"
+                    className="p-button-success mt-6"
+                    onClick={handleAddSelectedToBasket}
+                    disabled={selectedProducts.length === 0}
+                />
             )}
 
             {isAdmin && (
@@ -176,34 +163,54 @@ export default function ProductsPage() {
             >
                 <div className="field mb-3">
                     <label htmlFor="name" className="block mb-2">שם המוצר</label>
-                    <InputText id="name" className="w-full" value={newProduct.name}
-                        onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} />
+                    <InputText
+                        id="name"
+                        className="w-full"
+                        value={newProduct.name}
+                        onChange={e => setNewProduct({ ...newProduct, name: e.target.value })}
+                    />
                 </div>
 
-                {isAdmin && (
-                    <div className="field mb-3">
-                        <label htmlFor="code" className="block mb-2">קוד מוצר</label>
-                        <InputText id="code" className="w-full" value={newProduct.code}
-                            onChange={(e) => setNewProduct({ ...newProduct, code: e.target.value })} />
-                    </div>
-                )}
+                <div className="field mb-3">
+                    <label htmlFor="code" className="block mb-2">קוד מוצר</label>
+                    <InputText
+                        id="code"
+                        className="w-full"
+                        value={newProduct.code}
+                        onChange={e => setNewProduct({ ...newProduct, code: e.target.value })}
+                    />
+                </div>
 
                 <div className="field mb-3">
                     <label htmlFor="price" className="block mb-2">מחיר</label>
-                    <InputNumber id="price" className="w-full" value={newProduct.price}
-                        onValueChange={(e) => setNewProduct({ ...newProduct, price: e.value })} mode="currency" currency="ILS" locale="he-IL" />
+                    <InputNumber
+                        id="price"
+                        className="w-full"
+                        value={newProduct.price}
+                        onValueChange={e => setNewProduct({ ...newProduct, price: e.value })}
+                        mode="currency"
+                        currency="ILS"
+                        locale="he-IL"
+                    />
                 </div>
 
                 <div className="field mb-3">
                     <label htmlFor="imageUrl" className="block mb-2">קישור לתמונה</label>
-                    <InputText id="imageUrl" className="w-full" value={newProduct.imageUrl}
-                        onChange={(e) => setNewProduct({ ...newProduct, imageUrl: e.target.value })} />
+                    <InputText
+                        id="imageUrl"
+                        className="w-full"
+                        value={newProduct.imageUrl}
+                        onChange={e => setNewProduct({ ...newProduct, imageUrl: e.target.value })}
+                    />
                 </div>
 
                 <div className="field mb-3 flex align-items-center gap-2">
-                    <Checkbox inputId="isAvailable" checked={newProduct.isAvailable}
-                        onChange={(e) => setNewProduct({ ...newProduct, isAvailable: e.checked })} />
-                    <label htmlFor="isAvailable">זמין</label>
+                    <Checkbox
+                        inputId="isAvailable"
+                        checked={newProduct.isAvailable}
+                        onChange={e => setNewProduct({ ...newProduct, isAvailable: e.checked })}
+                    />
+                    <label htmlFor="isAvailable">זמין למכירה</label>
                 </div>
             </Dialog>
         </div>
