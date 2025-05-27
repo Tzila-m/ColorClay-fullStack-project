@@ -9,7 +9,7 @@ import {
   useCreateReservationMutation,
 } from "../features/tableAvailabilityApiSlice";
 
-import TableMap from "../components/TableMap"; 
+import TableMap from "../components/TableMap";
 
 
 export default function TablePage() {
@@ -19,7 +19,11 @@ export default function TablePage() {
   const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
 
-  const dateString = date ? new Date(date).toISOString().split("T")[0] : null;
+  const dateString = date
+    ? `${date.getFullYear()}-${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`
+    : null;
 
   const {
     data: tables = [],

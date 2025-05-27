@@ -219,3 +219,18 @@ exports.getOrderById = async (req, res) => {
         res.status(500).json({ message: "Error retrieving order", error });
     }
 }
+
+//get
+//status 4
+exports.getCompleteOrders = async (req, res) => {
+    try {
+        const orders = await Order.find({status: "4"})
+            .populate("userId")
+            .populate("productIds")
+            .populate("colorIds")
+            .populate("tableId");
+        res.status(200).json(orders);
+    } catch (error) {
+        res.status(500).json({ message: "Error retrieving order", error });
+    }
+}

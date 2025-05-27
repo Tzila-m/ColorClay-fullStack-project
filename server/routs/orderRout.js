@@ -8,9 +8,9 @@ const verifyAdmin = require("../middleware/verifyAdmin")
 router.use(verifyJWT)
 
 router.post("/", orderController.createOrder);
-router.post("/", orderController.createOrder);
 router.put("/addProductsAndColors/:orderId", orderController.addProductsAndColors);
 router.put("/confirmOrderPayment/:orderId", orderController.confirmOrderPayment);
 router.put("/markOrderReady/:orderId",verifyAdmin, orderController.markOrderReady);
 router.get("/:id", orderController.getOrderById);
+router.get("/",verifyAdmin, orderController.getCompleteOrders)
 module.exports = router;

@@ -17,11 +17,20 @@ const tableAvailabilityApiSlice = apiSlice.injectEndpoints({
         body: reservationData
       }),
       invalidatesTags: ['Availability']
+    }),
+    
+    getTodayReservations: build.query({
+      query: () => ({
+        url: '/tableAvailability/ByDate'
+      }),
+      providesTags: ['Availability']
     })
   })
+
 });
 
 export const {
   useGetAvailableTablesQuery,
-  useCreateReservationMutation
+  useCreateReservationMutation,
+  useGetTodayReservationsQuery
 } = tableAvailabilityApiSlice;

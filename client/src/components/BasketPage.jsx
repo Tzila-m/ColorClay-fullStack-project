@@ -9,18 +9,22 @@ import {
   increaseProductQuantity,
   decreaseProductQuantity,
 } from '../features/basketApiSlice';
+import { useConfirmOrderPaymentMutation } from '../features/orderApiSlice';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 
 const BasketPage = () => {
+  const dispatch = useDispatch();
+  const toast = useRef(null);
+
   const totalPrice = useSelector((state) => state.basket.totalPrice);
   const basketColors = useSelector((state) => state.basket.colors);
   const basketProducts = useSelector((state) => state.basket.products);
+  const orderId = useSelector((state) => state.basket.orderId); 
 
-  const dispatch = useDispatch();
-  const toast = useRef(null);
+  const [confirmOrderPayment, { isLoading }] = useConfirmOrderPaymentMutation();
 
   const handleRemoveColor = (code) => {
     dispatch(removeColor(code));
@@ -76,8 +80,24 @@ const BasketPage = () => {
     }
   };
 
-  const handleCheckout = () => {
-    toast.current.show({ severity: 'success', summary: 'מעבר לתשלום', detail: 'עבור לעמוד התשלום', life: 2000 });
+  const handleCheckout = async () => {
+    if (!orderId) {
+      toast.current.show({ severity: 'error', summary: 'שגיאה', detail: 'אין מזהה הזמנה פעיל', life: 3000 });
+      return;
+    }
+
+    try {
+      await confirmOrderPayment(orderId).unwrap();
+      dispatch(clearBasket());
+      toast.current.show({
+        severity: 'success',
+        summary: 'תודה על ההזמנה!',
+        detail: 'ההזמנה התקבלה. תישלח אליך הודעה כשההזמנה תהיה מוכנה.',
+        life: 4000,
+      });
+    } catch (error) {
+      toast.current.show({ severity: 'error', summary: 'שגיאה', detail: 'שגיאה באישור ההזמנה', life: 3000 });
+    }
   };
 
   if (basketColors.length === 0 && basketProducts.length === 0) {
@@ -91,7 +111,7 @@ const BasketPage = () => {
   return (
     <div className="form-container" style={{ maxWidth: 600 }}>
       <Toast ref={toast} position="top-right" />
-      <ConfirmDialog /> {/* חשוב - כאן מכניסים את רכיב ConfirmDialog */}
+      <ConfirmDialog />
       <h2 className="form-title">סל הקניות</h2>
 
       {/* מוצרים */}
@@ -99,7 +119,7 @@ const BasketPage = () => {
         <>
           <h3>מוצרים</h3>
           <div className="p-grid p-nogutter">
-            {basketProducts.map(product => (
+            {basketProducts.map((product) => (
               <div key={product.code} className="p-col-12">
                 <Card
                   className="color-card p-shadow-3"
@@ -168,7 +188,7 @@ const BasketPage = () => {
         <>
           <h3>צבעים</h3>
           <div className="p-grid p-nogutter">
-            {basketColors.map(color => (
+            {basketColors.map((color) => (
               <div key={color.code} className="p-col-12">
                 <Card
                   className="color-card p-shadow-3"
@@ -234,9 +254,10 @@ const BasketPage = () => {
 
       <div className="p-d-flex p-jc-between" style={{ marginTop: 16 }}>
         <Button
-          label="המשך לתשלום"
+          label={isLoading ? 'מעבד...' : 'לסיום ומעבר לתשלום'}
           className="p-button-success p-button-rounded"
           onClick={handleCheckout}
+          disabled={isLoading}
         />
       </div>
     </div>

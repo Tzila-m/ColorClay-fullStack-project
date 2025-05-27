@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
+  orderId: null,
   products: [],
   colors: [],
   totalProductsPrice: 0,
@@ -109,6 +110,19 @@ const basketApiSlice = createSlice({
         state.totalPrice = state.totalProductsPrice + state.totalColorsPrice;
       }
     },
+
+    setOrderId: (state, action) => {
+      state.orderId = action.payload;
+    },
+
+    clearBasket: (state) => {
+      // state.orderId = null;
+      state.products = [];
+      state.colors = [];
+      state.totalProductsPrice = 0;
+      state.totalColorsPrice = 0;
+      state.totalPrice = 0;
+    },
   },
 });
 
@@ -121,6 +135,7 @@ export const {
   removeColor,
   increaseColorQuantity,
   decreaseColorQuantity,
+  setOrderId,
   clearBasket,
 } = basketApiSlice.actions;
 

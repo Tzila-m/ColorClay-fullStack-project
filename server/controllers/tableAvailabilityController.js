@@ -1,43 +1,61 @@
 const Table = require("../models/Table");
 const TableAvailability = require("../models/TableAvailability");
+const Order = require('../models/Order'); 
 // router.get("/",tableAvailabilityController.getAvailableTables)
 // router.get("/ByDate",tableAvailabilityController.getReservationsByDate)
 // router.delete("/",verifyAdmin,tableAvailabilityController.deleteByDate)  
 
 //get
 exports.getAvailableTables = async (req, res) => {
-    const { date, timeSlot } = req.query;
+  const { date, timeSlot } = req.query;
 
-    if (!date || !timeSlot) {
-      return res.status(400).json({ message: 'Must have date and timeSlot' });
-    }
+  if (!date || !timeSlot) {
+    return res.status(400).json({ message: 'Must have date and timeSlot' });
+  }
 
-    const unavailableTables = await TableAvailability.find({ date, timeSlot }).select('tableId');
-    const unavailableIds = unavailableTables.map(item => item.tableId.toString());
+  const unavailableTables = await TableAvailability.find({ date, timeSlot }).select('tableId');
+  const unavailableIds = unavailableTables.map(item => item.tableId.toString());
 
-    //%nin מחזיר את מה שלא קיים 
-    const availableTables = await Table.find({
-      _id: { $nin: unavailableIds },
-    }).lean();
+  //%nin מחזיר את מה שלא קיים 
+  const availableTables = await Table.find({
+    _id: { $nin: unavailableIds },
+  }).lean();
 
-    return res.status(200).json(availableTables);
+  return res.status(200).json(availableTables);
 };
 
-//get
 exports.getReservationsByDate = async (req, res) => {
   try {
-    const { date } = req.query;
+    // לקבל היום לפי UTC - תחילת היום
+    const now = new Date();
+    const startOfDayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
 
-    if (!date) {
-      return res.status(400).json({ message: 'Must have a date' });
-    }
+    // תחילת היום הבא UTC
+    const startOfNextDayUTC = new Date(startOfDayUTC);
+    startOfNextDayUTC.setUTCDate(startOfNextDayUTC.getUTCDate() + 1);
 
-    const reservations = await TableAvailability.find({ date }).populate('tableId').lean();
-    res.json(reservations.tableId);
+    try {
+  const reservations = await Order.find({
+      date: { $gte: startOfDayUTC, $lt: startOfNextDayUTC }
+    })
+    .populate('tableId')
+    .populate('userId')
+    .lean();
+  res.json(reservations);
+} catch (error) {
+  console.error('Error populating:', error);
+  res.status(500).json({ message: 'Error retrieving orders', error: error.message });
+}
+
+
+    res.json(reservations);
   } catch (error) {
-    res.status(500).json({ message: ' Error retrieving countries ', error });
+    res.status(500).json({ message: 'Error retrieving reservations', error });
   }
 };
+
+
+
 
 
 // DELETE 

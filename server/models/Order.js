@@ -17,7 +17,7 @@ const orderSchema=new mongoose.Schema({
 
     tableId: { 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: "TableAvailability",
+        ref: "Table",
         required: true
     },
     totalPrice: { 
