@@ -34,7 +34,7 @@ const orderApiSlice = apiSlice.injectEndpoints({
     // PUT - סימון הזמנה כמוכנה (כולל שליחת מייל)
     markOrderReady: builder.mutation({
       query: (orderId) => ({
-        url: `/order/markOrderReady${orderId}`,
+        url: `/order/markOrderReady/${orderId}`,
         method: 'PUT',
       }),
       invalidatesTags: ['Order'],
@@ -46,9 +46,9 @@ const orderApiSlice = apiSlice.injectEndpoints({
       providesTags: ['Order'],
     }),
 
-    // GET - שליפת כל ההזמנות שהן בסטטוס 4 (מוכנות)
-    getCompleteOrders: builder.query({
-      query: () => `/order`,
+    // GET שליפת הזמנות לפי סטטוס
+    getOrdersByStatus: builder.query({
+      query: (status) => `/order/status/${status}`,
       providesTags: ['Order'],
     }),
   }),
@@ -60,5 +60,5 @@ export const {
   useConfirmOrderPaymentMutation,
   useMarkOrderReadyMutation,
   useGetOrderByIdQuery,
-  useGetCompleteOrdersQuery,
+  useGetOrdersByStatusQuery,
 } = orderApiSlice;

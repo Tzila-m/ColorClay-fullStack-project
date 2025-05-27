@@ -225,10 +225,14 @@ exports.getOrderById = async (req, res) => {
 }
 
 //get
-//status 4
-exports.getCompleteOrders = async (req, res) => {
+//status 
+exports.getOrdersByStatus = async (req, res) => {
+    const { status } = req.params;
+    if (!status) {
+        return res.status(400).json({ message: "Status parameter is required" });
+    }
     try {
-        const orders = await Order.find({ status: "4" })
+        const orders = await Order.find({ status })
             .populate("userId")
             .populate("productIds")
             .populate("colorIds")
@@ -238,4 +242,3 @@ exports.getCompleteOrders = async (req, res) => {
         res.status(500).json({ message: "Error retrieving order", error });
     }
 }
-

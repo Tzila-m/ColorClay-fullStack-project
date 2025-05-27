@@ -10,8 +10,7 @@ const login = async (req, res) => {
         return res.status(400).json({ message: 'All fields are required' })
     }
     const foundUser = await User.findOne({ username }).populate('orders').lean()
-    console.log(foundUser);
-    
+
     if (!foundUser) {
         return res.status(401).json({ message: 'Unauthorized' })
     }
@@ -31,10 +30,10 @@ const login = async (req, res) => {
         orders: foundUser.orders
     }
 
+    const accessToken = jwt.sign(userInfo, process.env.ACCESS_TOKEN_SECRET)
+    console.log("Login response:", { accessToken, userInfo });
 
-    const accessToken= jwt.sign(userInfo,process.env.ACCESS_TOKEN_SECRET)
-    res.json({accessToken:accessToken})
-   
+    res.json({ accessToken, userInfo });
 }
 
 

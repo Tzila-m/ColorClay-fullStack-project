@@ -12,5 +12,5 @@ router.put("/addProductsAndColors/:orderId", orderController.addProductsAndColor
 router.put("/confirmOrderPayment/:orderId", orderController.confirmOrderPayment);
 router.put("/markOrderReady/:orderId",verifyAdmin, orderController.markOrderReady);
 router.get("/:id", orderController.getOrderById);
-router.get("/",verifyAdmin, orderController.getCompleteOrders)
+router.get("/status/:status",verifyAdmin, orderController.getOrdersByStatus);
 module.exports = router;

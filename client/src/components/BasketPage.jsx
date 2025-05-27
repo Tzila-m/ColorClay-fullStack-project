@@ -9,8 +9,7 @@ import {
   increaseProductQuantity,
   decreaseProductQuantity,
 } from '../features/basketApiSlice';
-import { useConfirmOrderPaymentMutation, useAddProductsAndColorsMutation } from '../features/orderApiSlice';
-import { useGetOrderByIdQuery } from '../features/orderApiSlice';
+import { useConfirmOrderPaymentMutation, useAddProductsAndColorsMutation,useGetOrderByIdQuery } from '../features/orderApiSlice';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
@@ -29,7 +28,7 @@ const BasketPage = () => {
   console.log("orderId", orders[0]);
   const [confirmOrderPayment, { isLoading: isConfirmLoading }] = useConfirmOrderPaymentMutation();
   const [addProductsAndColorsMutation, { isLoading: isAddLoading }] = useAddProductsAndColorsMutation();
-  const [getOrderByIdQuery, { isLoading }] = useGetOrderByIdQuery();
+const [trigger, { data, isLoading, error }] = useGetOrderByIdQuery();
 
   const handleRemoveColor = (code) => {
     dispatch(removeColor(code));
@@ -105,7 +104,7 @@ const BasketPage = () => {
 
   // מחפשים הזמנה שעומדת בתנאים
   const validOrder = orders.find((order) => {
-    const orderObject = getOrderByIdQuery(order);
+    const orderObject = trigger(order);
     if (!orderObject) return false;
 
     // בדיקה סטטוס
