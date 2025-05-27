@@ -3,14 +3,14 @@ const Product = require("../models/Product")
 const Color = require("../models/Color")
 const nodemailer = require("nodemailer")
 const TableAvailability = require("../models/TableAvailability")
-
+const User = require("../models/User")
 //post
 //create order status1
 exports.createOrder = async (req, res) => {
     try {
         const { userId, tableId, date, timeSlot } = req.body;
 
-        if (!userId || !tableId || !date || !timeSlot ) {
+        if (!userId || !tableId || !date || !timeSlot) {
             return res.status(400).json({ message: "Missing required fields" });
         }
 
@@ -40,9 +40,13 @@ exports.createOrder = async (req, res) => {
             date,
             timeSlot,
         });
-         if (!newOrder) {
+        if (!newOrder) {
             return res.status(500).json({ message: 'Error while placing order' });
         }
+        await User.findByIdAndUpdate(userId, {
+            $push: { orders: newOrder._id }
+        });
+
         return res.status(201).json(newOrder);
 
     } catch (error) {
@@ -224,7 +228,7 @@ exports.getOrderById = async (req, res) => {
 //status 4
 exports.getCompleteOrders = async (req, res) => {
     try {
-        const orders = await Order.find({status: "4"})
+        const orders = await Order.find({ status: "4" })
             .populate("userId")
             .populate("productIds")
             .populate("colorIds")
@@ -234,3 +238,4 @@ exports.getCompleteOrders = async (req, res) => {
         res.status(500).json({ message: "Error retrieving order", error });
     }
 }
+
