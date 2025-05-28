@@ -61,6 +61,8 @@ exports.addProductsAndColors = async (req, res) => {
     try {
         const { orderId } = req.params;
         const { productIds = [], colorIds = [] } = req.body;
+        console.log("productIds", productIds);
+        console.log("colorIds", colorIds);
 
 
         if (!orderId) {
