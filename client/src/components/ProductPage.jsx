@@ -16,8 +16,7 @@ import {
 } from '../features/productApiSlice';
 
 import ProductCard from './ProductCard';
-
-import { addProduct } from '../features/basketApiSlice';  // וודא שיש לך slice עם פעולה כזו
+import { addProduct } from '../features/basketApiSlice';
 
 export default function ProductsPage() {
     const { categoryId } = useParams();
@@ -27,7 +26,14 @@ export default function ProductsPage() {
     const user = useSelector(state => state.auth.user);
     const isAdmin = user?.roles === 'admin';
 
-    const { data: products = [], isLoading, isError, error } = useGetProductByCategoryQuery(categoryId);
+    const {
+        data: products = [],
+        isLoading,
+        isError,
+        error
+    } = useGetProductByCategoryQuery(categoryId, {
+        pollingInterval: 5000
+    });
 
     const [deleteProduct] = useDeleteProductMutation();
     const [updateAvailable] = useUpdateAvailableProductMutation();
@@ -43,8 +49,8 @@ export default function ProductsPage() {
     });
 
     const [selectedProducts, setSelectedProducts] = useState([]);
+    const [imageFile, setImageFile] = useState(null);
 
-    // פונקציה לבחירה/הסרה של מוצר
     const toggleProductSelect = (productId, isAvailable) => {
         if (!isAvailable) {
             toast.current.show({ severity: 'warn', summary: 'המוצר אינו זמין כעת', life: 3000 });
@@ -63,7 +69,6 @@ export default function ProductsPage() {
         try {
             await deleteProduct(id).unwrap();
             toast.current.show({ severity: 'success', summary: 'המוצר נמחק בהצלחה', life: 3000 });
-            // הסר מהמוצרים שנבחרו אם היה
             setSelectedProducts(prev => prev.filter(pid => pid !== id));
         } catch {
             toast.current.show({ severity: 'error', summary: 'שגיאה במחיקת המוצר', life: 3000 });
@@ -79,8 +84,20 @@ export default function ProductsPage() {
         }
     };
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setNewProduct(prev => ({ ...prev, imageUrl: reader.result }));
+            setImageFile(file);
+        };
+        reader.readAsDataURL(file);
+    };
+
     const handleAddProduct = async () => {
-        if (!newProduct.name.trim() || !newProduct.code.trim() || newProduct.price <= 0 || !newProduct.imageUrl.trim()) {
+        if (!newProduct.name.trim() || !newProduct.code.trim() || newProduct.price <= 0 || !newProduct.imageUrl) {
             toast.current.show({ severity: 'warn', summary: 'אנא מלא את כל השדות', life: 3000 });
             return;
         }
@@ -89,6 +106,7 @@ export default function ProductsPage() {
             toast.current.show({ severity: 'success', summary: 'המוצר נוסף בהצלחה', life: 3000 });
             setShowAddDialog(false);
             setNewProduct({ name: '', code: '', price: 0, imageUrl: '', isAvailable: true });
+            setImageFile(null);
         } catch {
             toast.current.show({ severity: 'error', summary: 'שגיאה בהוספת מוצר', life: 3000 });
         }
@@ -124,7 +142,6 @@ export default function ProductsPage() {
                         onDelete={() => handleDelete(product._id)}
                         onToggleAvailable={() => handleToggleAvailable(product._id)}
                     />
-
                 ))}
             </div>
 
@@ -195,13 +212,16 @@ export default function ProductsPage() {
                 </div>
 
                 <div className="field mb-3">
-                    <label htmlFor="imageUrl" className="block mb-2">קישור לתמונה</label>
-                    <InputText
-                        id="imageUrl"
+                    <label htmlFor="imageFile" className="block mb-2">בחר תמונה</label>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
                         className="w-full"
-                        value={newProduct.imageUrl}
-                        onChange={e => setNewProduct({ ...newProduct, imageUrl: e.target.value })}
                     />
+                    {newProduct.imageUrl && (
+                        <img src={newProduct.imageUrl} alt="preview" className="mt-2 rounded" style={{ maxWidth: '100%', maxHeight: 200 }} />
+                    )}
                 </div>
 
                 <div className="field mb-3 flex align-items-center gap-2">

@@ -118,7 +118,7 @@ const AuthForm = () => {
       <div className="form-title text-center text-2xl font-bold mb-3">לכניסה לסטודיו שלנו</div>
       <Toast ref={toast} position="top-right" />
 
-      <TabView>
+      <TabView activeIndex={1}>
         <TabPanel header="הרשמה">
           <form onSubmit={handleRegisterSubmit} className="p-fluid">
             <div className="field" style={fieldStyle}>

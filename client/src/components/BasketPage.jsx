@@ -9,7 +9,8 @@ import {
   increaseProductQuantity,
   decreaseProductQuantity,
 } from '../features/basketApiSlice';
-import { useConfirmOrderPaymentMutation, useAddProductsAndColorsMutation,useGetOrderByIdQuery } from '../features/orderApiSlice';
+import { addOrder,updateOrder } from '../features/orderSlice';
+import { useConfirmOrderPaymentMutation, useAddProductsAndColorsMutation, useGetOrderByIdQuery } from '../features/orderApiSlice';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
@@ -23,12 +24,12 @@ const BasketPage = () => {
   const basketColors = useSelector((state) => state.basket.colors);
   const basketProducts = useSelector((state) => state.basket.products);
   const orders = useSelector((state) => state.auth.user.orders);
+  const user = useSelector((state) => state.auth.user);
 
   console.log("orders", orders);
   console.log("orderId", orders[0]);
   const [confirmOrderPayment, { isLoading: isConfirmLoading }] = useConfirmOrderPaymentMutation();
   const [addProductsAndColorsMutation, { isLoading: isAddLoading }] = useAddProductsAndColorsMutation();
-const [trigger, { data, isLoading, error }] = useGetOrderByIdQuery();
 
   const handleRemoveColor = (code) => {
     dispatch(removeColor(code));
@@ -86,97 +87,85 @@ const [trigger, { data, isLoading, error }] = useGetOrderByIdQuery();
 
   // פונקציה לשליחת מוצרים וצבעים להזמנה
   const addProducts = async () => {
-  const productIds = basketProducts.map((p) => p._id);
-  const colorIds = basketColors.map((c) => c._id);
+    const productIds = basketProducts.map((p) => p._id);
+    const colorIds = basketColors.map((c) => c._id);
 
-  const body = { productIds, colorIds };
+    const body = { productIds, colorIds };
 
-  const timeSlots = [
-    { name: "morning", start: 8, end: 12 },
-    { name: "afternoon", start: 13, end: 16 },
-    { name: "evening", start: 17, end: 20 },
-  ];
+    const timeSlots = [
+      { name: "morning", start: 8, end: 12 },
+      { name: "afternoon", start: 13, end: 16 },
+      { name: "evening", start: 17, end: 20 },
+    ];
 
-  const date = new Date();
-  const currentHour = date.getHours();
-  // היום UTC ללא זמן (תחילת היום)
-  const todayUTC = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const date = new Date();
+    const currentHour = date.getHours();
 
-  // מחפשים הזמנה שעומדת בתנאים
-  const validOrder = orders.find((order) => {
-    const orderObject = trigger(order);
-    if (!orderObject) return false;
+    const todayUTC = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
 
-    // בדיקה סטטוס
-    if (![1, 2].includes(orderObject.status)) return false;
+    // מחפשים הזמנה שעומדת בתנאים
+    const validOrder = orders.find((order) => {
+      return (order.status === "1")
 
-    // וידוא ש־date הוא אובייקט תאריך
-    const orderDate = new Date(orderObject.date);
-    if (orderDate.getTime() !== todayUTC.getTime()) return false;
+    })?[0] : null;
 
-    // משמרת
-    const slot = timeSlots.find((slot) => slot.name === orderObject.timeSlot);
-    if (!slot) return false;
-
-    return currentHour >= slot.start && currentHour < slot.end;
-  });
-
-  if (validOrder) {
-    try {
-      await addProductsAndColorsMutation({ orderId: validOrder, body }).unwrap();
-      dispatch(clearBasket());
-      toast.current.show({
-        severity: "success",
-        summary: "תכף תקבל את המוצרים",
-        life: 4000,
-      });
-    } catch (error) {
+    if (validOrder) {
+      try {
+        const object =await addProductsAndColorsMutation({ orderId: validOrder._id, body }).unwrap();
+        dispatch(clearBasket());
+        dispatch(addOrder(object));
+        toast.current.show({
+          severity: "success",
+          summary: "תכף תקבל את המוצרים",
+          life: 4000,
+        });
+      } catch (error) {
+        toast.current.show({
+          severity: "error",
+          summary: "שגיאה",
+          detail: error?.data?.message || "שגיאה באישור ההזמנה",
+          life: 3000,
+        });
+      }
+    } else {
       toast.current.show({
         severity: "error",
         summary: "שגיאה",
-        detail: error?.data?.message || "שגיאה באישור ההזמנה",
+        detail: "אין הזמנה פעילה להוספת מוצרים",
         life: 3000,
       });
     }
-  } else {
-    toast.current.show({
-      severity: "error",
-      summary: "שגיאה",
-      detail: "אין הזמנה פעילה להוספת מוצרים",
-      life: 3000,
-    });
-  }
-};
-
-  // פונקציה לסיום ותשלום ההזמנה
-  const handleCheckout = async () => {
-    if (!orders) {
-      toast.current.show({ severity: 'error', summary: 'שגיאה', detail: 'אין מזהה הזמנה פעיל', life: 3000 });
-      return;
-    }
-
-    try {
-      await confirmOrderPayment(orders).unwrap();
-      dispatch(clearBasket());
-      toast.current.show({
-        severity: 'success',
-        summary: 'תודה על ההזמנה!',
-        detail: 'ההזמנה התקבלה. תישלח אליך הודעה כשההזמנה תהיה מוכנה.',
-        life: 4000,
-      });
-    } catch (error) {
-      toast.current.show({ severity: 'error', summary: 'שגיאה', detail: 'שגיאה באישור ההזמנה', life: 3000 });
-    }
   };
 
+  // // פונקציה לסיום ותשלום ההזמנה
+  // const handleCheckout = async () => {
+  //   if (!orders) {
+  //     toast.current.show({ severity: 'error', summary: 'שגיאה', detail: 'אין מזהה הזמנה פעיל', life: 3000 });
+  //     return;
+  //   }
+
+  //   try {
+  //     await confirmOrderPayment(orders).unwrap();
+  //     dispatch(clearBasket());
+  //     toast.current.show({
+  //       severity: 'success',
+  //       summary: 'תודה על ההזמנה!',
+  //       detail: 'ההזמנה התקבלה. תישלח אליך הודעה כשההזמנה תהיה מוכנה.',
+  //       life: 4000,
+  //     });
+  //   } catch (error) {
+  //     toast.current.show({ severity: 'error', summary: 'שגיאה', detail: 'שגיאה באישור ההזמנה', life: 3000 });
+  //   }
+  // };
+
   // טיפול במקרה שהסל ריק
-  if (basketColors.length === 0 && basketProducts.length === 0) {
-    return (
-      <div className="form-container p-6 text-center" style={{ minHeight: '300px' }}>
-        סל הקניות שלך ריק
-      </div>
-    );
-  }
+  // if (basketColors.length === 0 && basketProducts.length === 0) {
+  //   return (
+  //     <div className="form-container p-6 text-center" style={{ minHeight: '300px' }}>
+  //       סל הקניות שלך ריק
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="form-container" style={{ maxWidth: 600 }}>
@@ -332,7 +321,7 @@ const [trigger, { data, isLoading, error }] = useGetOrderByIdQuery();
         <Button
           label={isConfirmLoading ? 'מעבד...' : 'לסיום ומעבר לתשלום'}
           className="p-button-success p-button-rounded"
-          onClick={handleCheckout}
+          onClick={addProducts}
           disabled={isConfirmLoading}
         />
       </div>

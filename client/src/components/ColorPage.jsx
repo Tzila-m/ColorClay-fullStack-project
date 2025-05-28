@@ -137,6 +137,16 @@ const ColorPage = () => {
 
   if (isLoading) return <div className="p-4">טוען צבעים...</div>;
   if (isError) return <div className="p-4 text-red-500">שגיאה בטעינת צבעים</div>;
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setNewColor({ ...newColor, imageUrl: reader.result });
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -198,13 +208,17 @@ const ColorPage = () => {
                 className="p-inputtext w-full mb-4"
               />
 
-              <label className="block mb-2">קישור לתמונה:</label>
+              <label className="block mb-2">תמונה מהמחשב:</label>
               <input
-                type="text"
-                value={newColor.imageUrl}
-                onChange={(e) => setNewColor({ ...newColor, imageUrl: e.target.value })}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
                 className="p-inputtext w-full mb-4"
               />
+
+              {newColor.imageUrl && (
+                <img src={newColor.imageUrl} alt="preview" className="h-32 object-contain mt-2" />
+              )}
             </form>
           </Dialog>
         </>
