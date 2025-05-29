@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { Card } from 'primereact/card';
 import { Tag } from 'primereact/tag';
 import { Chip } from 'primereact/chip';
+import { useNavigate } from 'react-router-dom';
 
 const statusMap = {
   "1": { label: 'הוזמן שולחן', color: 'info' },
@@ -18,6 +19,7 @@ const timeSlotMap = {
 };
 
 const OrderHistoryPage = () => {
+  const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
   const orders = useSelector((state) => state.order.orders);
 
@@ -25,11 +27,21 @@ const OrderHistoryPage = () => {
   if (!user) {
     return <div className="flex justify-content-center mt-5">לא מחובר</div>;
   }
-
-  if (!orders.length) {
-    return <div className="p-4" style={{ maxWidth: '800px', margin: 'auto' }}>אין הזמנות להצגה</div>;
+if (!orders.length) {
+    return (
+      <div className="p-4" style={{ maxWidth: '800px', margin: 'auto' }}>
+        עדיין לא ביצעתה הזמנה<br />
+        <span
+          onClick={() => navigate('/table')}
+          style={{ color: '#007bff', textDecoration: 'underline', cursor: 'pointer' }}
+        >
+          להזמנת שולחן
+        </span>
+      </div>
+    );
   }
-
+{ console.log(orders)
+}
   return (
     <div className="p-4" style={{ maxWidth: '800px', margin: 'auto' }}>
       <h2 className="form-title">היסטוריית הזמנות</h2>
@@ -45,6 +57,8 @@ const OrderHistoryPage = () => {
             </div>
             <Tag
               value={statusMap[order.status]?.label || 'לא ידוע'}
+             
+              
               severity={statusMap[order.status]?.color || 'secondary'}
               style={{ fontSize: '1.1rem', padding: '0.5rem 1rem' }}
             />

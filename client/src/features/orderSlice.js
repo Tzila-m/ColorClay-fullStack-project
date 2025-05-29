@@ -23,11 +23,25 @@ const orderSlice = createSlice({
 
         updateOrder: (state, action) => {
             let updatedOrder = [...state.orders];
-            const index = state.orders.findIndex(order => order._id === action.payload.validOrder._id);
+            const index = state.orders.findIndex(order => order._id === action.payload.orderId);
 
             if (index !== -1) {
                 updatedOrder[index].colorIds.push(action.payload.colorIds);
                 updatedOrder[index].productIds.push(action.payload.productIds);
+                updatedOrder[index].status="2";
+
+                state.orders = updatedOrder;
+            }
+        },
+
+        completeOrder: (state, action) => {
+            let updatedOrder = [...state.orders];
+            const index = state.orders.findIndex(order => order._id === action.payload.orderId);
+
+            if (index !== -1) {
+                updatedOrder[index].totalPrice = action.payload.totalPrice;
+                updatedOrder[index].status = "3";
+
                 state.orders = updatedOrder;
             }
         },
@@ -38,5 +52,5 @@ const orderSlice = createSlice({
     },
 });
 
-export const { addOrder, updateOrder, clearOrders, setOrders } = orderSlice.actions;
+export const { addOrder, updateOrder, clearOrders, setOrders, completeOrder } = orderSlice.actions;
 export default orderSlice.reducer;

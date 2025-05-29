@@ -9,7 +9,7 @@ import {
   increaseProductQuantity,
   decreaseProductQuantity,
 } from '../features/basketApiSlice';
-import { addOrder, updateOrder } from '../features/orderSlice';
+import { addOrder, updateOrder, completeOrder } from '../features/orderSlice';
 import { useConfirmOrderPaymentMutation, useAddProductsAndColorsMutation, useGetOrderByIdQuery } from '../features/orderApiSlice';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
@@ -29,6 +29,7 @@ const BasketPage = () => {
   console.log("orderId", orders[0]);
   const [confirmOrderPayment, { isLoading: isConfirmLoading }] = useConfirmOrderPaymentMutation();
   const [addProductsAndColorsMutation, { isLoading: isAddLoading }] = useAddProductsAndColorsMutation();
+
 
   const handleRemoveColor = (code) => {
     dispatch(removeColor(code));
@@ -103,7 +104,6 @@ const BasketPage = () => {
 
     const todayUTC = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
 
-    // מחפשים הזמנה שעומדת בתנאים
     const validOrder = orders.find((order) => {
       return (order.status === "1" || order.status === "2") &&
         timeSlots.find((slot) => (
@@ -112,16 +112,14 @@ const BasketPage = () => {
     })
 
     console.log("orders", orders);
-
-
     console.log("validOrder", validOrder);
 
 
     if (validOrder) {
       try {
-        console.log("productIds",productIds)
-        console.log("colorIds",colorIds);
-        
+        console.log("productIds", productIds)
+        console.log("colorIds", colorIds);
+
         const object = await addProductsAndColorsMutation({ orderId: validOrder._id, productIds, colorIds }).unwrap();
         dispatch(clearBasket());
         toast.current.show({
@@ -130,7 +128,8 @@ const BasketPage = () => {
           life: 4000,
         });
         dispatch(updateOrder({ orderId: validOrder._id, productIds, colorIds }));
-      } catch (error) {
+      }
+      catch (error) {
         toast.current.show({
           severity: "error",
           summary: "שגיאה",
@@ -148,35 +147,59 @@ const BasketPage = () => {
     }
   };
 
-  // // פונקציה לסיום ותשלום ההזמנה
-  // const handleCheckout = async () => {
-  //   if (!orders) {
-  //     toast.current.show({ severity: 'error', summary: 'שגיאה', detail: 'אין מזהה הזמנה פעיל', life: 3000 });
-  //     return;
-  //   }
 
-  //   try {
-  //     await confirmOrderPayment(orders).unwrap();
-  //     dispatch(clearBasket());
-  //     toast.current.show({
-  //       severity: 'success',
-  //       summary: 'תודה על ההזמנה!',
-  //       detail: 'ההזמנה התקבלה. תישלח אליך הודעה כשההזמנה תהיה מוכנה.',
-  //       life: 4000,
-  //     });
-  //   } catch (error) {
-  //     toast.current.show({ severity: 'error', summary: 'שגיאה', detail: 'שגיאה באישור ההזמנה', life: 3000 });
-  //   }
-  // };
+  const handleCheckout = async () => {
 
-  // טיפול במקרה שהסל ריק
-  // if (basketColors.length === 0 && basketProducts.length === 0) {
-  //   return (
-  //     <div className="form-container p-6 text-center" style={{ minHeight: '300px' }}>
-  //       סל הקניות שלך ריק
-  //     </div>
-  //   );
-  // }
+    const timeSlots = [
+      { name: "morning", start: 8, end: 12 },
+      { name: "afternoon", start: 13, end: 16 },
+      { name: "evening", start: 17, end: 22 },
+    ];
+
+    const date = new Date();
+    const currentHour = date.getHours();
+    console.log("currentHour", currentHour);
+
+    const todayUTC = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+
+    const validOrder = orders.find((order) => {
+      return (order.status === "2") &&
+        timeSlots.find((slot) => (
+          slot.name === order.timeSlot && currentHour >= slot.start 
+        ))
+    })
+
+    if (validOrder) {
+      const orderId = validOrder._id;
+      try {
+
+        const object = await confirmOrderPayment(orderId).unwrap();
+        dispatch(clearBasket());
+
+        toast.current.show({
+          severity: "success",
+          summary: `מעבר לתשלום בסך ${object.totalPrice} ₪`,
+          life: 4000,
+        });
+        dispatch(completeOrder({ orderId: validOrder._id, totalPrice: object.totalPrice }));
+      }
+      catch (error) {
+        toast.current.show({
+          severity: "error",
+          summary: "שגיאה",
+          detail: error?.data?.message || "שגיאה באישור ההזמנה",
+          life: 3000,
+        });
+      }
+    } else {
+      toast.current.show({
+        severity: "error",
+        summary: "שגיאה",
+        detail: "אין הזמנה פעילה להוספת מוצרים",
+        life: 3000,
+      });
+    }
+  }
 
   return (
     <div className="form-container" style={{ maxWidth: 600 }}>
@@ -330,9 +353,9 @@ const BasketPage = () => {
           disabled={isAddLoading}
         />
         <Button
-          label={isConfirmLoading ? 'מעבד...' : 'לסיום ומעבר לתשלום'}
+          label={isAddLoading ? 'מעבד...' : ' סיום אפשרות הזמנה, ומעבר לתשלום'}
           className="p-button-success p-button-rounded"
-          onClick={addProducts}
+          onClick={handleCheckout}
           disabled={isConfirmLoading}
         />
       </div>
