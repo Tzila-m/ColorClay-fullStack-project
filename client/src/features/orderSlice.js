@@ -1,32 +1,34 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-    user: {
-        orders: [],
-    }
+    orders: [],
 };
 
 const orderSlice = createSlice({
     name: 'orders',
     initialState,
     reducers: {
+        setOrders: (state, action) => {
+            state.orders = action.payload
+        },
         addOrder: (state, action) => {
-            const newOrder = action.payload;
+            let newOrder = [...state.orders]
+            console.log("action", action);
+            newOrder.push({ ...action.payload })
 
-            if (newOrder && newOrder._id) {
-                const exists = state.user.orders.find(order => order._id === newOrder._id);
-                if (!exists) {
-                    state.user.orders.push(newOrder);
-                }
-            }
+            state.orders = [...newOrder]
+            console.log("New order added:", newOrder);
+            console.log("Current orders:", state.orders);
         },
 
         updateOrder: (state, action) => {
-            const updatedOrder = action.payload;
-            const index = state.user.orders.findIndex(order => order._id === updatedOrder._id);
+            let updatedOrder = [...state.orders];
+            const index = state.orders.findIndex(order => order._id === action.payload.validOrder._id);
 
             if (index !== -1) {
-                state.user.orders[index] = updatedOrder;
+                updatedOrder[index].colorIds.push(action.payload.colorIds);
+                updatedOrder[index].productIds.push(action.payload.productIds);
+                state.orders = updatedOrder;
             }
         },
 
@@ -36,5 +38,5 @@ const orderSlice = createSlice({
     },
 });
 
-export const { addOrder, updateOrder, clearOrders } = orderSlice.actions;
+export const { addOrder, updateOrder, clearOrders, setOrders } = orderSlice.actions;
 export default orderSlice.reducer;

@@ -9,6 +9,7 @@ import { jwtDecode } from 'jwt-decode';
 import { setCredentials } from "../features/auth/authSlice";
 import { useRegisterMutation, useLoginMutation } from '../features/auth/authApiSlice';
 import { useNavigate } from 'react-router-dom';
+import { setOrders } from '../features/orderSlice';
 
 const AuthForm = () => {
   const dispatch = useDispatch();
@@ -92,6 +93,7 @@ const AuthForm = () => {
       const response = await loginFunc(loginData).unwrap();
       const decodedUser = jwtDecode(response.accessToken);
       dispatch(setCredentials({ user: decodedUser, token: response.accessToken }));
+      dispatch(setOrders  (decodedUser?.orders));
       navigate("/home");
     } catch (err) {
       let msg = 'שגיאה בהתחברות';

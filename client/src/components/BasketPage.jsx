@@ -9,7 +9,7 @@ import {
   increaseProductQuantity,
   decreaseProductQuantity,
 } from '../features/basketApiSlice';
-import { addOrder,updateOrder } from '../features/orderSlice';
+import { addOrder, updateOrder } from '../features/orderSlice';
 import { useConfirmOrderPaymentMutation, useAddProductsAndColorsMutation, useGetOrderByIdQuery } from '../features/orderApiSlice';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
@@ -23,8 +23,7 @@ const BasketPage = () => {
   const totalPrice = useSelector((state) => state.basket.totalPrice);
   const basketColors = useSelector((state) => state.basket.colors);
   const basketProducts = useSelector((state) => state.basket.products);
-  const orders = useSelector((state) => state.auth.user.orders);
-  const user = useSelector((state) => state.auth.user);
+  const orders = useSelector((state) => state.order.orders);
 
   console.log("orders", orders);
   console.log("orderId", orders[0]);
@@ -90,35 +89,47 @@ const BasketPage = () => {
     const productIds = basketProducts.map((p) => p._id);
     const colorIds = basketColors.map((c) => c._id);
 
-    const body = { productIds, colorIds };
+    // const body = { productIds, colorIds };
 
     const timeSlots = [
       { name: "morning", start: 8, end: 12 },
       { name: "afternoon", start: 13, end: 16 },
-      { name: "evening", start: 17, end: 20 },
+      { name: "evening", start: 17, end: 22 },
     ];
 
     const date = new Date();
     const currentHour = date.getHours();
+    console.log("currentHour", currentHour);
 
     const todayUTC = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
 
     // מחפשים הזמנה שעומדת בתנאים
     const validOrder = orders.find((order) => {
-      return (order.status === "1")
+      return (order.status === "1" || order.status === "2") &&
+        timeSlots.find((slot) => (
+          slot.name === order.timeSlot && currentHour >= slot.start && currentHour < slot.end
+        ))
+    })
 
-    })?[0] : null;
+    console.log("orders", orders);
+
+
+    console.log("validOrder", validOrder);
+
 
     if (validOrder) {
       try {
-        const object =await addProductsAndColorsMutation({ orderId: validOrder._id, body }).unwrap();
+        console.log("productIds",productIds)
+        console.log("colorIds",colorIds);
+        
+        const object = await addProductsAndColorsMutation({ orderId: validOrder._id, productIds, colorIds }).unwrap();
         dispatch(clearBasket());
-        dispatch(addOrder(object));
         toast.current.show({
           severity: "success",
           summary: "תכף תקבל את המוצרים",
           life: 4000,
         });
+        dispatch(updateOrder({ orderId: validOrder._id, productIds, colorIds }));
       } catch (error) {
         toast.current.show({
           severity: "error",

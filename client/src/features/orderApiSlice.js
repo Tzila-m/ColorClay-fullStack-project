@@ -14,7 +14,7 @@ const orderApiSlice = apiSlice.injectEndpoints({
 
     // PUT - הוספת מוצרים וצבעים להזמנה
     addProductsAndColors: builder.mutation({
-      query: ({ orderId, productIds, colorIds }) => ({
+      query: ({ orderId, productIds, colorIds }) => ({    
         url: `/order/addProductsAndColors/${orderId}`,
         method: 'PUT',
         body: { productIds, colorIds },

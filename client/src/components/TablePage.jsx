@@ -10,13 +10,15 @@ import {
 } from "../features/tableAvailabilityApiSlice";
 
 import TableMap from "../components/TableMap";
-
-
+import { useDispatch } from "react-redux";
+import { addOrder } from "../features/orderSlice";
 export default function TablePage() {
+  const dispatch = useDispatch();
   const [date, setDate] = useState(null);
   const [shift, setShift] = useState(null);
   const [selectedTable, setSelectedTable] = useState(null);
   const user = useSelector((state) => state.auth.user);
+  const orders = useSelector((state) => state.order.orders);
   const navigate = useNavigate();
 
   const dateString = date
@@ -38,12 +40,23 @@ export default function TablePage() {
   const handleReserve = async () => {
     if (!selectedTable) return;
     try {
-      await createReservation({
+    const object=  await createReservation({
         userId: user._id,
         tableId: selectedTable,
         date: dateString,
         timeSlot: shift,
       }).unwrap();
+
+      // const object = {
+      //   userId: user._id,
+      //   tableId: selectedTable,
+      //   date: dateString,
+      //   timeSlot: shift,
+
+      // }
+
+      dispatch(addOrder(object));
+
       alert("השולחן הוזמן בהצלחה!");
       navigate("/payment");
     } catch (err) {
