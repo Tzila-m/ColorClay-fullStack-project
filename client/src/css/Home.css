@@ -1,0 +1,44 @@
+.home-centered-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: none; /* רקע שקוף או לבן לפי הצורך */
+}
+
+.image-wrapper {
+  position: relative;
+  width: 90vw;
+  max-width: 500px;
+  aspect-ratio: 1 / 1;
+}
+
+.centered-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0; /* בלי פינות מעוגלות */
+  box-shadow: none; /* בלי צל */
+}
+
+.overlay-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: black; /* צבע טקסט פשוט */
+  text-align: center;
+  font-weight: normal;
+  text-shadow: none;
+}
+
+.welcome-line {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #8b8d79
+}
+
+.username-line {
+  font-size: 2.8rem;
+  font-weight: bold;
+  color:#c68062
+}

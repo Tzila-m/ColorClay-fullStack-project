@@ -11,6 +11,8 @@ import { Dialog } from 'primereact/dialog';
 import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
 
+import '../css/Category.css'
+
 export default function CategoryPage() {
     const { data: categories = [], isLoading, isError, error } = useGetAllCategoriesQuery();
     const [deleteCategory] = useDeleteCategoryMutation();
@@ -23,7 +25,6 @@ export default function CategoryPage() {
 
     const toast = useRef(null);
     const navigate = useNavigate();
-
     const user = useSelector((state) => state.auth.user);
     const isAdmin = user?.roles === 'admin';
 
@@ -64,100 +65,130 @@ export default function CategoryPage() {
         }
     };
 
-    if (isLoading) return <div className="p-4 text-center text-xl">טוען קטגוריות...</div>;
-    if (isError) return <div className="p-4 text-center text-red-500">שגיאה: {error?.message}</div>;
+    if (isLoading) return <div style={{ padding: '2rem', textAlign: 'center' }}>טוען קטגוריות...</div>;
+    if (isError) return <div style={{ padding: '2rem', color: 'red', textAlign: 'center' }}>שגיאה: {error?.message}</div>;
+
+    // סגנון לקטנים יותר וכפתורים ליד זה עם זה
+    const buttonContainerStyle = {
+        display: 'flex',
+        gap: '0.5rem',
+        justifyContent: 'flex-end',
+        marginTop: '1rem'
+    };
+
+    const buttonStyle = {
+        fontSize: '0.8rem',
+        padding: '0.3rem 0.6rem',
+        minWidth: 'auto'
+    };
 
     return (
-        <div className="w-screen max-w-none px-6 py-12" style={{ background: 'linear-gradient(135deg, #fde7e7, #fff2ec)' }}>
+        <div style={{ padding: '2rem' }}>
             <Toast ref={toast} />
-            <h1 className="text-center text-5xl font-bold mb-14 text-[#4d3c2d]">
-                קטגוריות
-            </h1>
+            <h1 style={{ textAlign: 'center', fontSize: '3rem', marginBottom: '2rem', color: '#4d3c2d' }}>קטגוריות</h1>
 
-            <div className="grid gap-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+            <div className="category-grid">
                 {categories.map((category) => (
                     <div
                         key={category._id}
-                        className="relative cursor-pointer bg-white rounded-3xl shadow-lg hover:shadow-2xl transition p-6 flex flex-col items-center hover:scale-105 transition-transform"
-                        onClick={() => handleCategoryClick(category._id)} 
+                        className="category-card"
+                        onClick={() => handleCategoryClick(category._id)}
                     >
-                        {isAdmin && (
-                            <Button
-                                icon="pi pi-trash"
-                                className="p-button-sm p-button-rounded p-button-danger absolute top-3 left-3"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteClick(category);
-                                }}
-                            />
-                        )}
-                        <div className="w-full flex flex-col items-center">
-                            <img
-                                src="/pictures/categories.png"
-                                alt={category.name}
-                                className="rounded-2xl mb-6"
-                                style={{
-                                    width: '100%',
-                                    height: '260px',
-                                    objectFit: 'cover',
-                                    borderRadius: '1.5rem',
-                                }}
-                            />
-                            <div className="text-3xl font-semibold text-[#5c4033] text-center">
-                                {category.name}
-                            </div>
+                        <img
+                            src="/pictures/categories.png"
+                            alt={category.name}
+                            style={{
+                                width: '100%',
+                                height: '200px',
+                                objectFit: 'cover',
+                                borderRadius: '12px',
+                                marginBottom: '1rem'
+                            }}
+                        />
+                        <div className="bottom-row">
+                            <h3 style={{ fontSize: '1.25rem', color: '#6c4e3d' }}>{category.name}</h3>
+                            {isAdmin && (
+                                <Button
+                                    icon="pi pi-trash"
+                                    className="p-button-rounded p-button-danger p-button-sm delete-button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteClick(category);
+                                    }}
+                                />
+                            )}
                         </div>
                     </div>
+
                 ))}
             </div>
 
             {isAdmin && (
                 <Button
                     icon="pi pi-plus"
-                    label=""
-                    className="p-button-rounded p-button-success fixed bottom-6 right-6 shadow-3 z-50"
+                    className="p-button-rounded p-button-success"
+                    style={{ position: 'fixed', bottom: '24px', right: '24px', width: '56px', height: '56px' }}
                     onClick={() => setShowAddDialog(true)}
-                    tooltip="הוסף קטגוריה"
-                    tooltipOptions={{ position: 'top' }}
-                    style={{ width: '3.5rem', height: '3.5rem' }}
                 />
             )}
 
-            {/* דיאלוג הוספה */}
             <Dialog
                 header="הוספת קטגוריה חדשה"
                 visible={showAddDialog}
                 style={{ width: '350px' }}
                 onHide={() => setShowAddDialog(false)}
                 footer={
-                    <div>
-                        <Button label="ביטול" icon="pi pi-times" className="p-button-text" onClick={() => setShowAddDialog(false)} />
-                        <Button label="שמור" icon="pi pi-check" className="p-button-primary" onClick={handleAddCategory} />
+                    <div style={buttonContainerStyle}>
+                        <Button
+                            label="ביטול"
+                            icon="pi pi-times"
+                            className="p-button-text"
+                            onClick={() => setShowAddDialog(false)}
+                            style={buttonStyle}
+                        />
+                        <Button
+                            label="שמור"
+                            icon="pi pi-check"
+                            className="p-button-primary"
+                            onClick={handleAddCategory}
+                            style={buttonStyle}
+                        />
                     </div>
                 }
             >
-                <div className="field mb-4">
-                    <label htmlFor="name" className="block mb-2 text-right">שם הקטגוריה</label>
+                <div className="mb-4">
+                    <label htmlFor="name" className="block mb-2 text-right font-semibold">שם הקטגוריה</label>
                     <InputText
                         id="name"
                         value={newCategory.name}
                         onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
                         className="w-full"
-                        placeholder="לדוגמה: כלי אוכל"
+                        placeholder="לדוגמה: כוסות, צלחות..."
                     />
                 </div>
             </Dialog>
 
-            {/* דיאלוג מחיקה */}
             <Dialog
                 header="אישור מחיקה"
                 visible={showDeleteDialog}
                 style={{ width: '30vw' }}
                 onHide={() => setShowDeleteDialog(false)}
                 footer={
-                    <div>
-                        <Button label="ביטול" icon="pi pi-times" onClick={() => setShowDeleteDialog(false)} className="p-button-text" />
-                        <Button label="מחק" icon="pi pi-trash" onClick={confirmDelete} severity="danger" />
+                    <div style={buttonContainerStyle}>
+                        <Button
+                            label="ביטול"
+                            icon="pi pi-times"
+                            onClick={() => setShowDeleteDialog(false)}
+                            className="p-button-text"
+                            style={buttonStyle}
+                        />
+                        <Button
+                            label="מחק"
+                            icon="pi pi-trash"
+                            onClick={confirmDelete}
+                            severity="danger"
+                            style={buttonStyle}
+                        />
                     </div>
                 }
             >

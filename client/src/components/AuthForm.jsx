@@ -11,6 +11,8 @@ import { useRegisterMutation, useLoginMutation } from '../features/auth/authApiS
 import { useNavigate } from 'react-router-dom';
 import { setOrders } from '../features/orderSlice';
 
+import '../css/AuthForm.css'
+
 const AuthForm = () => {
   const dispatch = useDispatch();
   const [registerFunc] = useRegisterMutation();

@@ -1,0 +1,109 @@
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin: 0 auto;
+    max-width: 1200px;
+    padding: 1rem;
+}
+
+.category-card {
+    position: relative;
+    background: white;
+    border-radius: 20px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.category-card:hover {
+    transform: scale(1.03);
+}
+
+.category-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+.category-card .bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+.category-card h3 {
+    font-size: 1.2rem;
+    color: #5e4034;
+    margin: 0;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 0.5rem;
+}
+
+.delete-button {
+    position: static !important;
+    /* לא מוחץ עם absolute */
+    display: inline-flex;
+    /* במקום inline-block */
+    align-items: center;
+    /* למרכז אנכי */
+    justify-content: center;
+    /* למרכז אופקי */
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    font-size: 1.1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+
+/* רספונסיביות */
+
+/* מסך מחשב - שומר על עיצוב רגיל */
+@media (min-width: 769px) {
+    .category-grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .category-card img {
+        height: 180px;
+    }
+
+    .category-card h3 {
+        font-size: 1.2rem;
+    }
+}
+
+/* טלפונים וקטנים - עמודה אחת, תמונה קטנה יותר, כותרת וכפתור גם קטנים */
+@media (max-width: 768px) {
+    .category-grid {
+        grid-template-columns: 1fr;
+        padding: 0.5rem;
+        gap: 1rem;
+    }
+
+    .category-card img {
+        height: 140px;
+    }
+
+    .category-card h3 {
+        font-size: 1rem;
+    }
+
+    .delete-button {
+        width: 20px !important;
+        height: 20px !important;
+        font-size: 0.9rem !important;
+    }
+}

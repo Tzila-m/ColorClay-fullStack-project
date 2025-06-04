@@ -42,7 +42,7 @@ input, .p-inputtext {
 
 button, .p-button {
   width: 100%;
-  background-color: #b36aa2; /* סגול מהלוגו */
+  background-color: #539865; /* סגול מהלוגו */
   color: white;
   padding: 14px;
   border: none;
@@ -53,7 +53,7 @@ button, .p-button {
 }
 
 button:hover, .p-button:hover {
-  background-color: #a15894;
+  background-color: #597675;
 }
 
 .p-float-label label {
@@ -111,7 +111,7 @@ button:hover, .p-button:hover {
 .color-card .color-name {
   font-size: 1.1rem;
   font-weight: bold;
-  color: #b36aa2; /* סגול מהלוגו */
+  color: #695965; /* סגול מהלוגו */
 }
 
 .color-card .color-code {
@@ -125,11 +125,11 @@ button:hover, .p-button:hover {
 }
 
 .color-card .available {
-  color: #4caf50;
+  color: #446b45;
 }
 
 .color-card .unavailable {
-  color: #f44336;
+  color: #ad645f;
 }
 
 .color-card.disabled {
@@ -165,9 +165,10 @@ button:hover, .p-button:hover {
 }
 
 .available {
-  color: green;
+  color: rgb(63, 110, 63);
 }
 
 .unavailable {
-  color: red;
+  color: rgb(212, 89, 89);
 }
+

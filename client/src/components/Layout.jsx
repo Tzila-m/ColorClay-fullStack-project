@@ -70,7 +70,7 @@ export default function Layout() {
   const start = (
     <img
       alt="logo"
-      src="/logo.png"
+      src="/pictures/logo.png"
       className="logo"
       style={{ height: '40px' }}
     />
