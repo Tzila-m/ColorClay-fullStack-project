@@ -44,9 +44,9 @@ const Status3Page = () => {
           <div className="flex flex-column md:flex-row md:justify-content-between align-items-center">
             <div>
               <p><strong>מס׳ הזמנה:</strong> {order._id || '---'}</p>
-              <p><strong>שם לקוח:</strong> {order.customerName || '---'}</p>
+              <p><strong>שם לקוח:</strong> {order.userId?.name || '---'}</p>
               <p><strong>תאריך:</strong> {order.date ? new Date(order.date).toLocaleDateString() : '---'}</p>
-              <p><strong>סכום לתשלום:</strong> {order.total ? `${order.total} ₪` : '---'}</p>
+              <p><strong>סכום לתשלום:</strong> {order.totalPrice ? `${order.totalPrice} ₪` : '---'}</p>
             </div>
             <div className="flex align-items-center gap-3">
               <Tag
@@ -55,7 +55,7 @@ const Status3Page = () => {
                 className="p-tag-rounded p-tag-plain"
                 style={{ fontSize: '1rem', padding: '0.3rem 0.75rem', fontWeight: '500' }}
               />
-              <Button 
+              <Button
                 label="הכלי מוכן לאיסוף"
                 icon="pi pi-check"
                 disabled={isUpdating}

@@ -21,24 +21,28 @@ const Status4Page = () => {
   return (
     <div className="p-4" style={{ maxWidth: '800px', margin: 'auto' }}>
       <h2 className="form-title mb-4">הזמנות שהושלמו (סטטוס 4)</h2>
-      {completeOrders.map((order, index) => (
-        <Card key={order._id || index} className="mb-3">
-          <div className="flex flex-column md:flex-row md:justify-content-between align-items-center">
-            <div>
-              <p><strong>מס׳ הזמנה:</strong> {order._id || '---'}</p>
-              <p><strong>שם לקוח:</strong> {order.customerName || '---'}</p>
-              <p><strong>תאריך:</strong> {order.date ? new Date(order.date).toLocaleDateString() : '---'}</p>
-              <p><strong>סכום לתשלום:</strong> {order.total ? `${order.total} ₪` : '---'}</p>
+      {completeOrders.map((order, index) => {
+        console.log("order:", order); // ✅ כך מדפיסים בצורה נכונה
+        return (
+          <Card key={order._id || index} className="mb-3">
+            <div className="flex flex-column md:flex-row md:justify-content-between align-items-center">
+              <div>
+                <p><strong>מס׳ הזמנה:</strong> {order._id || '---'}</p>
+                <p><strong>שם לקוח:</strong> {order.userId?.name || '---'}</p>
+                <p><strong>תאריך:</strong> {order.date ? new Date(order.date).toLocaleDateString() : '---'}</p>
+                <p><strong>סכום לתשלום:</strong> {order.totalPrice ? `${order.totalPrice} ₪` : '---'}</p>
+
+              </div>
+              <Tag
+                value={statusMap["4"].label}
+                severity={statusMap["4"].color}
+                className="p-tag-rounded p-tag-plain"
+                style={{ fontSize: '1rem', padding: '0.3rem 0.75rem', fontWeight: '500' }}
+              />
             </div>
-            <Tag
-              value={statusMap["4"].label}
-              severity={statusMap["4"].color}
-              className="p-tag-rounded p-tag-plain"
-              style={{ fontSize: '1rem', padding: '0.3rem 0.75rem', fontWeight: '500' }}
-            />
-          </div>
-        </Card>
-      ))}
+          </Card>
+        );
+      })}
     </div>
   );
 };
