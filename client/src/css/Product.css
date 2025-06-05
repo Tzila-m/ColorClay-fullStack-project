@@ -40,10 +40,14 @@
     transform: scale(1.03);
 }
 
-.product-card:selected{
-     border-color: #7c614c; 
-  background-color: #ffffff;
+.product-card.selected,
+.color-card.selected {
+  border: 3px solid #7c614c; /* מסגרת צבעונית להדגשה */
+  background-color: #f9f5f1; /* רקע בהיר */
+  box-shadow: 0 4px 12px rgba(124, 97, 76, 0.3); /* צל עדין */
+  transition: all 0.3s ease;
 }
+
 .fixed-add-to-cart {
   position: fixed !important;
   bottom: 24px;
