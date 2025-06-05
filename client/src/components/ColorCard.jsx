@@ -1,82 +1,70 @@
-import React from 'react'
-import { Button } from 'primereact/button'
+import React from 'react';
+import { Button } from 'primereact/button';
 
 const ColorCard = ({
   color,
   isSelected,
   isAdmin,
-  toggleColorSelect,
-  handleDelete,
-  handleToggleAvailable
+  onClick,
+  onDelete,
+  onToggleAvailable
 }) => {
-  const isDisabled = !isAdmin && !color.isAvailable
+  const isDisabled = !isAdmin && !color.isAvailable;
 
-  const cardClass = `
-    color-card
-    ${isSelected ? 'selected' : ''}
-    ${isDisabled ? 'disabled' : ''}
-  `
+  const handleCardClick = () => {
+    if (!isAdmin && onClick) {
+      onClick(color._id, color.isAvailable);
+    }
+  };
 
   return (
     <div
-      key={color._id}
-      className={cardClass}
-      onClick={() => {
-        if (!isAdmin) {
-          toggleColorSelect(color._id, color.isAvailable)
-        }
-      }}
+      className={`product-card ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`}
+      onClick={handleCardClick}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
         if (!isAdmin && (e.key === 'Enter' || e.key === ' ')) {
-          e.preventDefault()
-          toggleColorSelect(color._id, color.isAvailable)
+          e.preventDefault();
+          handleCardClick();
         }
       }}
     >
-      {isAdmin && (
-        <div className="absolute top-2 left-2 flex flex-col gap-2 z-10">
-          <Button
-            icon="pi pi-trash"
-            className="p-button-danger p-button-sm"
-            onClick={(e) => {
-              e.stopPropagation()
-              handleDelete(color._id)
-            }}
-            aria-label="מחיקת צבע"
-          />
-          <Button
-            icon="pi pi-refresh"
-            className={`p-button-sm ${color.isAvailable ? 'p-button-warning' : 'p-button-success'}`}
-            onClick={(e) => {
-              e.stopPropagation()
-              handleToggleAvailable(color._id)
-            }}
-            tooltip={color.isAvailable ? 'סמן כלא זמין' : 'סמן כזמין'}
-            tooltipOptions={{ position: 'top' }}
-            aria-label="עדכון זמינות צבע"
-          />
-        </div>
-      )}
-
       <img
         src={color.imageUrl}
         alt={color.name}
-        style={{ filter: isDisabled ? 'brightness(85%)' : 'none' }}
+        className="color-image"
       />
 
-      <div className="color-name">{color.name}</div>
-      <div className="color-code">{color.code}</div>
 
-      {/* תוספת: טקסט זמינות גם למנהל */}
-      {(isAdmin || !isAdmin) && (
-        <div className={`availability ${color.isAvailable ? 'available' : 'unavailable'}`}>
+      <div className="bottom-row">
+        <h3>{color.name}</h3>
+        {isAdmin && (
+          <div className="admin-actions">
+            <Button
+              icon="pi pi-trash"
+              className="p-button-rounded p-button-danger p-button-sm action-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(color._id);
+              }}
+            />
+            <Button
+              icon={color.isAvailable ? 'pi pi-check-circle' : 'pi pi-times-circle'}
+              className={`p-button-rounded p-button-sm action-button ${color.isAvailable ? 'p-button-success' : 'p-button-warning'}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleAvailable(color._id);
+              }}
+            />
+          </div>
+        )}
+        <div className={`product-availability ${color.isAvailable ? 'available' : 'not-available'}`}>
           {color.isAvailable ? 'זמין' : 'לא זמין'}
         </div>
-      )}
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default ColorCard
+export default ColorCard;

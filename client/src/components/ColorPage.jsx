@@ -11,6 +11,11 @@ import { Dialog } from 'primereact/dialog';
 import { Toast } from 'primereact/toast';
 import ColorCard from './ColorCard';
 import { addColor } from '../features/basketApiSlice';
+import { Tooltip } from 'primereact/tooltip';
+
+
+import '../css/Color.css'
+
 
 const ColorPage = () => {
   const dispatch = useDispatch();
@@ -152,17 +157,17 @@ const ColorPage = () => {
     <div className="p-6 max-w-6xl mx-auto">
       <Toast ref={toast} position="top-right" />
 
-      {!isAdmin && (
-        <h2 className="text-3xl font-semibold mb-6">בחר צבעים</h2>
+      {(
+        <h2 className="text-3xl font-semibold mb-6">צבעים</h2>
       )}
 
       {isAdmin && (
         <>
           <Button
-            label="הוסף צבע חדש"
             icon="pi pi-plus"
-            className="p-button-info mb-6"
+            className="floating-add-button p-button-rounded p-button-info"
             onClick={() => setShowAddForm(true)}
+            aria-label="הוסף צבע חדש"
           />
 
           <Dialog
@@ -172,7 +177,7 @@ const ColorPage = () => {
             modal
             onHide={() => setShowAddForm(false)}
             footer={
-              <div className="flex justify-end gap-2">
+              <div className="dialog-footer-buttons">
                 <Button
                   label="ביטול"
                   icon="pi pi-times"
@@ -188,6 +193,7 @@ const ColorPage = () => {
                 />
               </div>
             }
+
           >
             <form id="addColorForm" onSubmit={handleAddNewColor}>
               <label className="block mb-2">שם צבע:</label>
@@ -224,29 +230,36 @@ const ColorPage = () => {
         </>
       )}
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+      <div className="color-grid">
         {colors.map(color => (
           <ColorCard
             key={color._id}
             color={color}
             isSelected={selectedColors.includes(color._id)}
             isAdmin={isAdmin}
-            toggleColorSelect={toggleColorSelect}
-            handleDelete={handleDelete}
-            handleToggleAvailable={handleToggleAvailable}
+            onClick={toggleColorSelect}
+            onDelete={handleDelete}
+            onToggleAvailable={handleToggleAvailable}
           />
+
         ))}
       </div>
 
       {!isAdmin && (
-        <Button
-          label="הוסף לסל"
-          icon="pi pi-shopping-cart"
-          className="p-button-success"
-          onClick={handleAddSelectedColorsToBasket}
-          disabled={selectedColors.length === 0}
-        />
+        <>
+          <Tooltip target=".floating-cart-button" content="הוסף לסל" position="left" />
+
+          <Button
+
+            icon="pi pi-shopping-cart"
+            className="floating-cart-button p-button-rounded p-button-success"
+            onClick={handleAddSelectedColorsToBasket}
+            disabled={selectedColors.length === 0}
+            aria-label="הוסף לסל"
+          />
+        </>
       )}
+
     </div>
   );
 };

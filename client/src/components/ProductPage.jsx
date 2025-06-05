@@ -133,14 +133,15 @@ export default function ProductsPage() {
 
             {!isAdmin && (
                 <Button
-                    label="הוסף לסל"
                     icon="pi pi-shopping-cart"
-                    className="p-button-success"
-                    style={{ marginTop: '1rem' }}
+                    className="p-button-rounded p-button-success fixed-add-to-cart"
                     onClick={handleAddToBasket}
                     disabled={selectedProducts.length === 0}
+                    tooltip="הוסף לסל"
+                    tooltipOptions={{ position: 'left' }}
                 />
             )}
+
 
             {isAdmin && (
                 <Button
