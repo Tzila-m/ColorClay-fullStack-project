@@ -20,8 +20,8 @@ export default function Layout() {
       label: 'המוצרים שלנו',
       icon: 'pi pi-tags',
       items: [
-        { label: 'צבעים', icon: 'pi pi-palette' ,command: () => navigate('/color') },
-        { label: 'קטגוריות מוצרים', icon: 'pi pi-th-large' ,command: () => navigate('/category') }
+        { label: 'צבעים', icon: 'pi pi-palette', command: () => navigate('/color') },
+        { label: 'קטגוריות מוצרים', icon: 'pi pi-th-large', command: () => navigate('/category') }
       ]
     },
     {
@@ -47,20 +47,21 @@ export default function Layout() {
       label: 'המוצרים שלנו',
       icon: 'pi pi-tags',
       items: [
-        { label: 'צבעים', icon: 'pi pi-palette' ,command: () => navigate('/color')},
-        { label: 'קטגוריות מוצרים', icon: 'pi pi-th-large' ,command: () => navigate('/category')}
+        { label: 'צבעים', icon: 'pi pi-palette', command: () => navigate('/color') },
+        { label: 'קטגוריות מוצרים', icon: 'pi pi-th-large', command: () => navigate('/category') }
       ]
     },
     {
       label: 'סטטוס הזמנות',
-      icon: 'pi pi-cog',
+      icon: 'pi pi-list',
       items: [
-        { label: 'סטטוס 1', icon: 'pi pi-sort-numeric-up' ,command: () => navigate('/status1')},
-        { label: 'סטטוס 2', icon: 'pi pi-sort-numeric-up-alt' ,command: () => navigate('/status2')},
-        { label: 'סטטוס 3', icon: 'pi pi-refresh' ,command: () => navigate('/status3')},
-        { label: 'סטטוס 4', icon: 'pi pi-check' ,command: () => navigate('/status4')}
+        { label: 'הזמנות להיום', icon: 'pi pi-calendar', command: () => navigate('/status1') },
+        { label: 'הזמנות פעילות', icon: 'pi pi-spin pi-cog', command: () => navigate('/status2') },
+        { label: 'הזמנות בטיפול', icon: 'pi pi-exclamation-circle', command: () => navigate('/status3') },
+        { label: 'הזמנות שהושלמו', icon: 'pi pi-check-circle', command: () => navigate('/status4') }
       ]
     }
+
   ];
 
 

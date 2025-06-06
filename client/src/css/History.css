@@ -1,0 +1,40 @@
+.order-history-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.08);
+  padding: 2rem 1.5rem;
+  direction: rtl;
+}
+
+.order-history-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #3f51b5;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.order-card {
+  border-radius: 12px;
+  box-shadow: 0 1px 8px 0 rgba(0,0,0,0.06);
+  background: #f9f9f9;
+}
+
+.order-details p {
+  margin: 0.2rem 0;
+  font-size: 1.1rem;
+}
+
+.order-section-title {
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
