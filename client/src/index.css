@@ -42,7 +42,7 @@ input, .p-inputtext {
 
 button, .p-button {
   width: 100%;
-  background-color: #539865; /* סגול מהלוגו */
+  background-color: #a998a8; /* סגול מהלוגו */
   color: white;
   padding: 14px;
   border: none;
@@ -85,10 +85,10 @@ button:hover, .p-button:hover {
 }
 
 .available {
-  color: rgb(63, 110, 63);
+  color: rgb(64, 86, 64);
 }
 
 .unavailable {
-  color: rgb(212, 89, 89);
+  color: rgb(225, 99, 99);
 }
 

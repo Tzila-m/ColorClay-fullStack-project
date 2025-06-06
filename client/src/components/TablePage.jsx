@@ -1,24 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useNavigate } from "react-router-dom";
+import { Toast } from 'primereact/toast';
+
 import {
   useGetAvailableTablesQuery,
   useCreateReservationMutation,
 } from "../features/tableAvailabilityApiSlice";
-
 import TableMap from "../components/TableMap";
-import { useDispatch } from "react-redux";
 import { addOrder } from "../features/orderSlice";
+
+import '../css/tableMap.css';
+
 export default function TablePage() {
   const dispatch = useDispatch();
+  const toast = useRef(null);
+
   const [date, setDate] = useState(null);
   const [shift, setShift] = useState(null);
   const [selectedTable, setSelectedTable] = useState(null);
   const user = useSelector((state) => state.auth.user);
-  const orders = useSelector((state) => state.order.orders);
   const navigate = useNavigate();
 
   const dateString = date
@@ -40,45 +44,45 @@ export default function TablePage() {
   const handleReserve = async () => {
     if (!selectedTable) return;
     try {
-    const object=  await createReservation({
+      const object = await createReservation({
         userId: user._id,
         tableId: selectedTable,
         date: dateString,
         timeSlot: shift,
       }).unwrap();
 
-      // const object = {
-      //   userId: user._id,
-      //   tableId: selectedTable,
-      //   date: dateString,
-      //   timeSlot: shift,
-
-      // }
-
       dispatch(addOrder(object));
+      toast.current.show({
+        severity: 'success',
+        summary: 'הזמנה בוצעה',
+        detail: 'השולחן הוזמן בהצלחה!',
+        life: 3000
+      });
 
-      alert("השולחן הוזמן בהצלחה!");
-      navigate("/payment");
     } catch (err) {
       alert(err?.data?.message || "שגיאה בהזמנה");
     }
   };
 
   return (
-    <div className="p-6 grid md:grid-cols-2 gap-8">
+    <div className="table-page">
+      <Toast ref={toast} />
 
-      {/* צד שמאל: תאריך ומשמרת */}
-      <div className="flex flex-col items-center gap-6">
+      <div className="table-left">
         <h2 className="text-xl font-semibold text-gray-800">בחר תאריך</h2>
-        <Calendar
-          value={date}
-          onChange={(e) => setDate(e.value)}
-          inline
-          showWeek
-          minDate={new Date()}
-          maxDate={new Date(new Date().setDate(new Date().getDate() + 14))}
-        />
-        <div className="flex gap-3 flex-wrap justify-center">
+        <div className="calendar-wrapper">
+          <Calendar
+            value={date}
+            onChange={(e) => setDate(e.value)}
+            inline
+            showWeek
+            rtl
+            minDate={new Date()}
+            maxDate={new Date(new Date().setDate(new Date().getDate() + 14))}
+          />
+        </div>
+
+        <div className="shift-buttons">
           {["morning", "afternoon", "evening"].map((slot) => (
             <Button
               key={slot}
@@ -96,8 +100,9 @@ export default function TablePage() {
         </div>
       </div>
 
-      {/* צד ימין: מפת שולחנות */}
-      <div className="flex flex-col items-center">
+      <div className="divider"></div>
+
+      <div className="table-right">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">בחר שולחן פנוי:</h2>
 
         {isLoading && <p>🔄 טוען שולחנות...</p>}
@@ -109,15 +114,14 @@ export default function TablePage() {
           setSelectedTable={setSelectedTable}
         />
 
-        {/* כפתור הזמנה */}
         {selectedTable && (
-          <div className="mt-8 text-center">
+          <div className="mt-4 text-center">
             <Button
               label='הזמן שולחן (20 ש"ח)'
               icon='pi pi-credit-card'
               onClick={handleReserve}
               severity='success'
-              className="px-6 py-3 text-lg"
+              className="p-button-lg"
             />
           </div>
         )}

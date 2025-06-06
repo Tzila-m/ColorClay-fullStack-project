@@ -1,0 +1,263 @@
+.table-map-wrapper {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.table-map {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.table-row {
+  display: flex;
+  gap: 60px;
+  align-items: center;
+}
+
+.chair {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #d6ccc2;
+}
+
+.table-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.table-button {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid #dcdcdc;
+  background-color: #fefcfb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 48px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.table-button:hover {
+  background-color: #e6f0e6;
+}
+
+.table-button.disabled {
+  background-color: #f0f0f0;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.table-button.selected {
+  background-color: #b5cbbb;
+  color: white;
+}
+
+.row-table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.row-table .center {
+  display: flex;
+  gap: 4px;
+}
+
+.table-center {
+  text-align: center;
+  border-radius: 12px;
+  border: 1px solid #dcdcdc;
+  background-color: #fefcfb;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  padding: 12px;
+  min-width: 96px;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-center.large {
+  min-width: 112px;
+  min-height: 80px;
+}
+
+.table-center:hover {
+  background-color: #e6f0e6;
+}
+
+.table-center.disabled {
+  background-color: #f0f0f0;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.table-center.selected {
+  background-color: #b5cbbb;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .table-map {
+    gap: 24px;
+    margin-top: 16px;
+  }
+
+  .table-row {
+    gap: 32px;
+  }
+
+  .table-button {
+    width: 38px;
+    height: 38px;
+    font-size: 12px;
+    line-height: 38px;
+  }
+
+  .table-center {
+    min-width: 80px;
+    min-height: 54px;
+    font-size: 12px;
+    padding: 10px;
+  }
+
+  .table-center.large {
+    min-width: 92px;
+    min-height: 66px;
+  }
+
+  .chair {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+.table-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .table-page {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .table-left,
+  .table-right {
+    width: 50%;
+  }
+
+  .divider {
+    width: 1px;
+    background-color: #ccc;
+    height: 100%;
+    margin: 0 1rem;
+  }
+}
+
+.shift-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.shift-buttons button {
+  font-size: 0.875rem;
+  padding: 0.3rem 0.6rem;
+}
+
+@media (min-width: 500px) {
+  .shift-buttons {
+    flex-wrap: nowrap;
+  }
+}
+
+.p-datepicker {
+  direction: rtl !important;
+}
+
+.p-datepicker .p-datepicker-header {
+  flex-direction: row-reverse !important;
+}
+
+.p-datepicker .p-datepicker-title {
+  margin: 0 auto;
+}
+
+
+/* כפתורי החצים */
+.calendar-wrapper .p-datepicker-prev,
+.calendar-wrapper .p-datepicker-next {
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.calendar-wrapper .p-datepicker-prev:hover,
+.calendar-wrapper .p-datepicker-next:hover {
+  color: #b5e8f9; /* גוון רך יותר בעת ריחוף */
+}
+
+
+.calendar-wrapper .p-datepicker-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem; /* רווח בין החודש לשנה */
+  padding: 0.5rem 1rem;
+  background-color: #5299b0cd;
+  border-radius: 16px 16px 0 0;
+  color: white;
+  font-weight: bold;
+  font-size: 0.9rem; /* גודל קטן יותר */
+}
+
+/* הסרת ה-flex-grow של הטייטל */
+.calendar-wrapper .p-datepicker-title {
+  flex-grow: 0;
+  display: flex;
+  gap: 0.5rem;
+  user-select: none;
+  
+}
+
+/* חודש ושנה כל אחד בתיבת טקסט נפרדת */
+.calendar-wrapper .p-datepicker-title > span {
+  display: inline-block;
+}
+
+.calendar-wrapper .p-datepicker-title {
+  color: white;
+  white-space: nowrap;
+  user-select: none;
+  flex-grow: 0;
+  display: flex;
+  gap: 0.5rem;
+}
